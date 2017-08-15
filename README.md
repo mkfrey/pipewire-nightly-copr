@@ -1,3 +1,0 @@
-# pipewire
-
-The pipewire package
