@@ -13,7 +13,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.3
+Version:        0.1.4
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            http://www.freedesktop.org/wiki/Software/PipeWire
@@ -51,6 +51,12 @@ Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       systemd >= 184
 Requires:       rtkit
+
+# https://bugzilla.redhat.com/983606
+%global _hardened_build 1
+
+## enable systemd activation
+%global systemd 1
 
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
@@ -112,6 +118,9 @@ exit 0
 %files
 %license LICENSE GPL LGPL
 %doc README
+%if 0%{?systemd}
+%{_userunitdir}/pipewire.*
+%endif
 %{_bindir}/pipewire
 %{_libdir}/libpipewire-%{majorminor}.so.*
 %{_libdir}/libspa-lib.so.*
@@ -145,6 +154,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Wed Aug 23 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.4-1
+- Update to 0.1.4
+
 * Wed Aug 09 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.3-1
 - Update to 0.1.3
 
