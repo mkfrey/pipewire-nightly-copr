@@ -1,0 +1,28 @@
+From ff363cc7bf1db8da7ffe3423de0fb85fd1531bc2 Mon Sep 17 00:00:00 2001
+From: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+Date: Mon, 4 Sep 2017 06:09:18 -0300
+Subject: [PATCH] spa/include/meson: Install hook.h (#11)
+
+When compiling some application and include spa/loop.h, it needs hook.h,
+so install it.
+
+Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+---
+ spa/include/spa/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/spa/include/spa/meson.build b/spa/include/spa/meson.build
+index 1d08868..64431a4 100644
+--- a/spa/include/spa/meson.build
++++ b/spa/include/spa/meson.build
+@@ -10,6 +10,7 @@ spa_headers = [
+   'format.h',
+   'format-builder.h',
+   'format-utils.h',
++  'hook.h',
+   'list.h',
+   'log.h',
+   'loop.h',
+-- 
+2.13.5
+
