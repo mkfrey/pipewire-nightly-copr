@@ -14,7 +14,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.1.4
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            http://www.freedesktop.org/wiki/Software/PipeWire
 %if 0%{?gitrel}
@@ -157,6 +157,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Sep 14 2017 Kalev Lember <klember@redhat.com> - 0.1.4-3
+- Rebuilt for GNOME 3.26.0 megaupdate
+
 * Fri Sep 08 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.4-2
 - Install SPA hooks
 
