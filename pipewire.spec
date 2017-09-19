@@ -13,8 +13,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.4
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.1.5
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            http://www.freedesktop.org/wiki/Software/PipeWire
 %if 0%{?gitrel}
@@ -26,7 +26,6 @@ Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{ver
 %endif
 
 ## upstream patches
-Patch1: 0001-spa-include-meson-Install-hook.h-11.patch
 
 ## upstreamable patches
 
@@ -97,8 +96,6 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch1 -p1 -b .0001
-
 %build
 %meson
 %meson_build
@@ -152,11 +149,16 @@ exit 0
 
 %files utils
 %{_bindir}/pipewire-monitor
+%{_bindir}/pipewire-cli
 %{_mandir}/man1/pipewire-monitor.1*
+%{_mandir}/man1/pipewire-cli.1*
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Sep 19 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.5-1
+- Update to 0.1.5
+
 * Thu Sep 14 2017 Kalev Lember <klember@redhat.com> - 0.1.4-3
 - Rebuilt for GNOME 3.26.0 megaupdate
 
