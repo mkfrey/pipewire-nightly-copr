@@ -1,0 +1,26 @@
+From 8f67aa2c3887fa72ccf6bbcd2d10b4e5b1a6da54 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Tue, 19 Sep 2017 13:16:22 +0200
+Subject: [PATCH] deviceprovide: only signal when there is a loop
+
+---
+ src/gst/gstpipewiredeviceprovider.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/gst/gstpipewiredeviceprovider.c b/src/gst/gstpipewiredeviceprovider.c
+index 69480d0..eb70afe 100644
+--- a/src/gst/gstpipewiredeviceprovider.c
++++ b/src/gst/gstpipewiredeviceprovider.c
+@@ -321,7 +321,8 @@ on_state_changed (void *data, enum pw_remote_state old, enum pw_remote_state sta
+       GST_ERROR_OBJECT (self, "remote error: %s", error);
+       break;
+   }
+-  pw_thread_loop_signal (self->main_loop, FALSE);
++  if (self->main_loop)
++    pw_thread_loop_signal (self->main_loop, FALSE);
+ }
+ 
+ 
+-- 
+2.13.5
+
