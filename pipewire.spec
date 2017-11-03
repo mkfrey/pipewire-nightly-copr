@@ -13,8 +13,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.5
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.1.6
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            http://www.freedesktop.org/wiki/Software/PipeWire
 %if 0%{?gitrel}
@@ -26,7 +26,6 @@ Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{ver
 %endif
 
 ## upstream patches
-Patch1: 0001-deviceprovide-only-signal-when-there-is-a-loop.patch
 
 ## upstreamable patches
 
@@ -97,10 +96,8 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch1 -p1 -b .0001
-
 %build
-%meson
+%meson -D enable_docs=true -D enable_man=true
 %meson_build
 
 %install
@@ -159,6 +156,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Fri Nov 03 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.6-1
+- Update to 0.1.6
+
 * Tue Sep 19 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.5-2
 - Add patch to avoid segfault when probing
 
