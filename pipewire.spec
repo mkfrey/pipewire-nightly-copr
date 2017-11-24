@@ -26,6 +26,8 @@ Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{ver
 %endif
 
 ## upstream patches
+Patch1: 0001-Only-define-memfd_create-when-not-already-defined.patch
+
 
 ## upstreamable patches
 
@@ -96,6 +98,8 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
+%patch1 -p1 -b .0001
+
 %build
 %meson -D enable_docs=true -D enable_man=true -D enable_gstreamer=true
 %meson_build
@@ -158,6 +162,7 @@ exit 0
 %changelog
 * Fri Nov 24 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.7-1
 - Update to 0.1.7
+- Add to build when memfd_create is already defined
 
 * Fri Nov 03 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.6-1
 - Update to 0.1.6
