@@ -1,13 +1,13 @@
-From 2a86814bb8c45f6cb65092a44c0327460772c34d Mon Sep 17 00:00:00 2001
+From 6b189642454c56930662140e26bab8f6deb0aec9 Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Fri, 24 Nov 2017 17:23:40 +0100
 Subject: [PATCH] Only define memfd_create when not already defined
 
 ---
  config.h.meson                | 1 +
- meson.build                   | 4 ++++
+ meson.build                   | 2 ++
  src/pipewire/memfd-wrappers.h | 2 ++
- 3 files changed, 7 insertions(+)
+ 3 files changed, 5 insertions(+)
 
 diff --git a/config.h.meson b/config.h.meson
 index 0d5add7..e0ff4f6 100644
@@ -19,10 +19,10 @@ index 0d5add7..e0ff4f6 100644
  #mesondefine HAVE_DECL_STRSIGNAL
 +#mesondefine HAVE_MEMFD_CREATE
 diff --git a/meson.build b/meson.build
-index 29c52db..7943abd 100644
+index de73426..59f6242 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -117,6 +117,10 @@ if cc.has_function('mkstemp', prefix : '#include <stdlib.h>')
+@@ -117,6 +117,8 @@ if cc.has_function('mkstemp', prefix : '#include <stdlib.h>')
    cdata.set('HAVE_MKSTEMP', 1)
  endif
  
