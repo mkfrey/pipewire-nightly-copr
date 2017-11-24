@@ -1,21 +1,47 @@
-From 78fa6b851fc5f3ed669cb1487aee315ad6a45389 Mon Sep 17 00:00:00 2001
+From 2a86814bb8c45f6cb65092a44c0327460772c34d Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Fri, 24 Nov 2017 17:23:40 +0100
 Subject: [PATCH] Only define memfd_create when not already defined
 
 ---
+ config.h.meson                | 1 +
+ meson.build                   | 4 ++++
  src/pipewire/memfd-wrappers.h | 2 ++
- 1 file changed, 2 insertions(+)
+ 3 files changed, 7 insertions(+)
 
+diff --git a/config.h.meson b/config.h.meson
+index 0d5add7..e0ff4f6 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -445,3 +445,4 @@
+ #mesondefine HAVE_ALARM
+ #mesondefine HAVE_DECL_LOCALTIME_R
+ #mesondefine HAVE_DECL_STRSIGNAL
++#mesondefine HAVE_MEMFD_CREATE
+diff --git a/meson.build b/meson.build
+index 29c52db..7943abd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -117,6 +117,10 @@ if cc.has_function('mkstemp', prefix : '#include <stdlib.h>')
+   cdata.set('HAVE_MKSTEMP', 1)
+ endif
+ 
++if cc.has_function('memfd_create', prefix : '#include <sys/mman.h>')
++  cdata.set('HAVE_MEMFD_CREATE', 1)
++endif
++
+ configure_file(input : 'config.h.meson',
+   output : 'config.h',
+   configuration : cdata)
 diff --git a/src/pipewire/memfd-wrappers.h b/src/pipewire/memfd-wrappers.h
-index 05958fe..75ed628 100644
+index 05958fe..860e396 100644
 --- a/src/pipewire/memfd-wrappers.h
 +++ b/src/pipewire/memfd-wrappers.h
 @@ -20,6 +20,7 @@
  #include <sys/syscall.h>
  #include <fcntl.h>
  
-+#ifndef memfd_create
++#ifndef HAVE_MEMFD_CREATE
  /*
   * No glibc wrappers exist for memfd_create(2), so provide our own.
   *
