@@ -13,7 +13,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.6
+Version:        0.1.7
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            http://www.freedesktop.org/wiki/Software/PipeWire
@@ -97,7 +97,7 @@ This package contains command line utilities for the PipeWire media server.
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %build
-%meson -D enable_docs=true -D enable_man=true
+%meson -D enable_docs=true -D enable_man=true -D enable_gstreamer=true
 %meson_build
 
 %install
@@ -156,6 +156,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Fri Nov 24 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.7-1
+- Update to 0.1.7
+
 * Fri Nov 03 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.6-1
 - Update to 0.1.6
 
