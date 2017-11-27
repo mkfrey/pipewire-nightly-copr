@@ -1,8 +1,15 @@
-From 2a86814bb8c45f6cb65092a44c0327460772c34d Mon Sep 17 00:00:00 2001
+From 41ef42b09fe397dd5d317f3022df48c644887cd1 Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Fri, 24 Nov 2017 17:23:40 +0100
-Subject: Only define memfd_create when not already defined
+Subject: [PATCH] Only define memfd_create when not already defined
 
+---
+ config.h.meson                |  1 +
+ meson.build                   |  4 +++
+ src/pipewire/mem.c            |  4 +++
+ src/pipewire/memfd-wrappers.h | 60 -------------------------------------------
+ 4 files changed, 9 insertions(+), 60 deletions(-)
+ delete mode 100644 src/pipewire/memfd-wrappers.h
 
 diff --git a/config.h.meson b/config.h.meson
 index 0d5add7..e0ff4f6 100644
@@ -14,37 +21,115 @@ index 0d5add7..e0ff4f6 100644
  #mesondefine HAVE_DECL_STRSIGNAL
 +#mesondefine HAVE_MEMFD_CREATE
 diff --git a/meson.build b/meson.build
-index 29c52db..7943abd 100644
+index e7e3cf3..6ee6b58 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -117,6 +117,10 @@ if cc.has_function('mkstemp', prefix : '#include <stdlib.h>')
    cdata.set('HAVE_MKSTEMP', 1)
  endif
  
-+if cc.has_function('memfd_create', prefix : '#include <sys/mman.h>', args : [ '-D__USE_GNU' ])
++if cc.has_function('memfd_create', prefix : '#include <sys/mman.h>', args : [ '-D_GNU_SOURCE' ])
 +  cdata.set('HAVE_MEMFD_CREATE', 1)
 +endif
 +
  configure_file(input : 'config.h.meson',
    output : 'config.h',
    configuration : cdata)
-diff --git a/src/pipewire/memfd-wrappers.h b/src/pipewire/memfd-wrappers.h
-index 05958fe..860e396 100644
---- a/src/pipewire/memfd-wrappers.h
-+++ b/src/pipewire/memfd-wrappers.h
-@@ -20,6 +20,7 @@
- #include <sys/syscall.h>
- #include <fcntl.h>
+diff --git a/src/pipewire/mem.c b/src/pipewire/mem.c
+index dcd1fe4..4e17c3a 100644
+--- a/src/pipewire/mem.c
++++ b/src/pipewire/mem.c
+@@ -21,6 +21,8 @@
+ #define _GNU_SOURCE
+ #endif
+ 
++#include "config.h"
++
+ #include <string.h>
+ #include <stddef.h>
+ #include <stdio.h>
+@@ -34,6 +36,7 @@
+ #include <pipewire/log.h>
+ #include <pipewire/mem.h>
  
 +#ifndef HAVE_MEMFD_CREATE
  /*
   * No glibc wrappers exist for memfd_create(2), so provide our own.
   *
-@@ -32,6 +33,7 @@ static inline int
- memfd_create(const char *name, unsigned int flags) {
+@@ -46,6 +49,7 @@ static inline int memfd_create(const char *name, unsigned int flags)
+ {
  	return syscall(SYS_memfd_create, name, flags);
  }
 +#endif
  
  /* memfd_create(2) flags */
  
+diff --git a/src/pipewire/memfd-wrappers.h b/src/pipewire/memfd-wrappers.h
+deleted file mode 100644
+index 05958fe..0000000
+--- a/src/pipewire/memfd-wrappers.h
++++ /dev/null
+@@ -1,60 +0,0 @@
+-/* PipeWire
+- * Copyright (C) 2016 Wim Taymans <wim.taymans@gmail.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Library General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Library General Public License for more details.
+- *
+- * You should have received a copy of the GNU Library General Public
+- * License along with this library; if not, write to the
+- * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+- * Boston, MA 02110-1301, USA.
+- */
+-
+-#include <sys/syscall.h>
+-#include <fcntl.h>
+-
+-/*
+- * No glibc wrappers exist for memfd_create(2), so provide our own.
+- *
+- * Also define memfd fcntl sealing macros. While they are already
+- * defined in the kernel header file <linux/fcntl.h>, that file as
+- * a whole conflicts with the original glibc header <fnctl.h>.
+- */
+-
+-static inline int
+-memfd_create(const char *name, unsigned int flags) {
+-	return syscall(SYS_memfd_create, name, flags);
+-}
+-
+-/* memfd_create(2) flags */
+-
+-#ifndef MFD_CLOEXEC
+-#define MFD_CLOEXEC       0x0001U
+-#endif
+-
+-#ifndef MFD_ALLOW_SEALING
+-#define MFD_ALLOW_SEALING 0x0002U
+-#endif
+-
+-/* fcntl() seals-related flags */
+-
+-#ifndef F_LINUX_SPECIFIC_BASE
+-#define F_LINUX_SPECIFIC_BASE 1024
+-#endif
+-
+-#ifndef F_ADD_SEALS
+-#define F_ADD_SEALS (F_LINUX_SPECIFIC_BASE + 9)
+-#define F_GET_SEALS (F_LINUX_SPECIFIC_BASE + 10)
+-
+-#define F_SEAL_SEAL     0x0001  /* prevent further seals from being set */
+-#define F_SEAL_SHRINK   0x0002  /* prevent file from shrinking */
+-#define F_SEAL_GROW     0x0004  /* prevent file from growing */
+-#define F_SEAL_WRITE    0x0008  /* prevent writes */
+-#endif
+-- 
+2.14.3
+
