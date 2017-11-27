@@ -16,7 +16,7 @@ Summary:        Media Sharing Server
 Version:        0.1.7
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
-URL:            http://www.freedesktop.org/wiki/Software/PipeWire
+URL:            https://pipewire.org/
 %if 0%{?gitrel}
 # git clone git://anongit.freedesktop.org/gstreamer/pipewire
 # cd pipewire; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
