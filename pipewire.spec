@@ -13,7 +13,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.7
+Version:        0.1.8
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
@@ -26,7 +26,6 @@ Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{ver
 %endif
 
 ## upstream patches
-Patch1: 0001-Only-define-memfd_create-when-not-already-defined.patch
 
 
 ## upstreamable patches
@@ -48,6 +47,7 @@ BuildRequires:  libv4l-devel
 BuildRequires:  doxygen
 BuildRequires:  xmltoman
 BuildRequires:  graphviz
+BuildRequires:  sbc-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -97,8 +97,6 @@ This package contains command line utilities for the PipeWire media server.
 
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
-
-%patch1 -p1 -b .0001
 
 %build
 %meson -D enable_docs=true -D enable_man=true -D enable_gstreamer=true
@@ -160,6 +158,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Jan 23 2018 Wim Taymans <wtaymans@redhat.com> - 0.1.8-1
+- Update to 0.1.8
+
 * Fri Nov 24 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.7-1
 - Update to 0.1.7
 - Add to build when memfd_create is already defined
