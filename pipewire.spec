@@ -14,7 +14,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.1.8
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -114,8 +114,7 @@ getent passwd pipewire >/dev/null || \
     useradd -r -g pipewire -d /var/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
 exit 0
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE GPL LGPL
@@ -158,6 +157,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Sat Feb 03 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.1.8-2
+- Switch to %%ldconfig_scriptlets
+
 * Tue Jan 23 2018 Wim Taymans <wtaymans@redhat.com> - 0.1.8-1
 - Update to 0.1.8
 
