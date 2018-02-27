@@ -13,8 +13,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.8
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.1.9
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -157,6 +157,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Feb 27 2018 Wim Taymans <wtaymans@redhat.com> - 0.1.9-1
+- Update to 0.1.9
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.8-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
