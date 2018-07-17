@@ -13,8 +13,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.1.9
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.2.0
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -31,6 +31,7 @@ Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{ver
 ## upstreamable patches
 
 BuildRequires:  meson >= 0.35.0
+BuildRequires:  gcc
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
@@ -157,6 +158,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Jul 17 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.0-1
+- Update to 0.2.0
+
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
