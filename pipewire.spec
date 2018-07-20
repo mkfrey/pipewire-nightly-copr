@@ -13,7 +13,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
@@ -158,6 +158,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Fri Jul 20 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.1-1
+- Update to 0.2.1
+
 * Tue Jul 17 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.0-1
 - Update to 0.2.0
 
