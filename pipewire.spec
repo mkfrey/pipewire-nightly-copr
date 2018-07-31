@@ -1,4 +1,4 @@
-%global majorminor   0.1
+%global apiversion   0.2
 
 #global snap       20141103
 #global gitrel     327
@@ -13,7 +13,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.1
+Version:        0.2.2
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
@@ -124,10 +124,10 @@ exit 0
 %{_userunitdir}/pipewire.*
 %endif
 %{_bindir}/pipewire
-%{_libdir}/libpipewire-%{majorminor}.so.*
+%{_libdir}/libpipewire-%{apiversion}.so.*
 %{_libdir}/libspa-lib.so.*
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
-%{_libdir}/pipewire-%{majorminor}/
+%{_libdir}/pipewire-%{apiversion}/
 %{_libdir}/spa/
 %{_mandir}/man1/pipewire.1*
 %{_sysconfdir}/pipewire/pipewire.conf
@@ -139,12 +139,12 @@ exit 0
 #%dir %{_libdir}/pipewire/
 
 %files devel
-%{_libdir}/libpipewire-%{majorminor}.so
+%{_libdir}/libpipewire-%{apiversion}.so
 %{_libdir}/libspa-lib.so
 %{_includedir}/pipewire/
 %{_includedir}/spa/
-%{_libdir}/pkgconfig/libpipewire-%{majorminor}.pc
-%{_libdir}/pkgconfig/libspa-%{majorminor}.pc
+%{_libdir}/pkgconfig/libpipewire-%{apiversion}.pc
+%{_libdir}/pkgconfig/libspa-%{apiversion}.pc
 
 %files doc
 %{_datadir}/doc/pipewire/html
@@ -158,6 +158,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Jul 31 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.2-1
+- Update to 0.2.2
+
 * Fri Jul 20 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.1-1
 - Update to 0.2.1
 
