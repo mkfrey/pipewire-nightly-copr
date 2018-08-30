@@ -1,4 +1,5 @@
 %global apiversion   0.2
+%global spaversion   0.1
 
 #global snap       20141103
 #global gitrel     327
@@ -13,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.2
+Version:        0.2.3
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
@@ -22,7 +23,7 @@ URL:            https://pipewire.org/
 # cd pipewire; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
 Source0:        pipewire-%{version}-%{gitrel}-g%{shortcommit}.tar.gz
 %else
-Source0:        http://freedesktop.org/software/pipewire/releases/pipewire-%{version}.tar.gz
+Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
 %endif
 
 ## upstream patches
@@ -100,7 +101,7 @@ This package contains command line utilities for the PipeWire media server.
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %build
-%meson -D enable_docs=true -D enable_man=true -D enable_gstreamer=true
+%meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
 %meson_build
 
 %install
@@ -125,7 +126,6 @@ exit 0
 %endif
 %{_bindir}/pipewire
 %{_libdir}/libpipewire-%{apiversion}.so.*
-%{_libdir}/libspa-lib.so.*
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/pipewire-%{apiversion}/
 %{_libdir}/spa/
@@ -140,11 +140,10 @@ exit 0
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
-%{_libdir}/libspa-lib.so
 %{_includedir}/pipewire/
 %{_includedir}/spa/
 %{_libdir}/pkgconfig/libpipewire-%{apiversion}.pc
-%{_libdir}/pkgconfig/libspa-%{apiversion}.pc
+%{_libdir}/pkgconfig/libspa-%{spaversion}.pc
 
 %files doc
 %{_datadir}/doc/pipewire/html
@@ -152,12 +151,16 @@ exit 0
 %files utils
 %{_bindir}/pipewire-monitor
 %{_bindir}/pipewire-cli
+%{_mandir}/man1/pipewire.conf.5*
 %{_mandir}/man1/pipewire-monitor.1*
 %{_mandir}/man1/pipewire-cli.1*
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Aug 30 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-1
+- Update to 0.2.3
+
 * Tue Jul 31 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.2-1
 - Update to 0.2.2
 
