@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.3
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -27,6 +27,7 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
 %endif
 
 ## upstream patches
+Patch0:		0001-add-systemd-socket-activation.patch
 
 
 ## upstreamable patches
@@ -100,6 +101,8 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
+%patch0 -p1 -b .0000
+
 %build
 %meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
 %meson_build
@@ -107,13 +110,16 @@ This package contains command line utilities for the PipeWire media server.
 %install
 %meson_install
 
+mkdir %{buildroot}%{_userunitdir}/sockets.target.wants
+ln -s ../pipewire.socket %{buildroot}%{_userunitdir}/sockets.target.wants/pipewire.socket
+
 %check
 %meson_test
 
 %pre
 getent group pipewire >/dev/null || groupadd -r pipewire
 getent passwd pipewire >/dev/null || \
-    useradd -r -g pipewire -d /var/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
+    useradd -r -g pipewire -d %{_localstatedir}/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
 exit 0
 
 %ldconfig_scriptlets
@@ -123,6 +129,7 @@ exit 0
 %doc README
 %if 0%{?systemd}
 %{_userunitdir}/pipewire.*
+%{_userunitdir}/sockets.target.wants/pipewire.socket
 %endif
 %{_bindir}/pipewire
 %{_libdir}/libpipewire-%{apiversion}.so.*
@@ -158,6 +165,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Wed Oct 18 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-2
+- Add systemd socket activation
+
 * Thu Aug 30 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-1
 - Update to 0.2.3
 
