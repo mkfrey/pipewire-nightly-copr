@@ -143,7 +143,6 @@ exit 0
 %license LICENSE GPL LGPL
 %doc README
 %dir %{_sysconfdir}/pipewire/
-#%dir %{_libdir}/pipewire/
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
@@ -165,7 +164,7 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
-* Wed Oct 18 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-2
+* Thu Oct 18 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-2
 - Add systemd socket activation
 
 * Thu Aug 30 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-1
