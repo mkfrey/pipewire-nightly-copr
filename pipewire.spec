@@ -14,8 +14,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.3
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.2.4
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -27,7 +27,6 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
 %endif
 
 ## upstream patches
-Patch0:		0001-add-systemd-socket-activation.patch
 
 
 ## upstreamable patches
@@ -101,10 +100,8 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch0 -p1 -b .0000
-
 %build
-%meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
+%meson -D docs=true -D man=true -D gstreamer=enabled -D systemd=true
 %meson_build
 
 %install
@@ -157,13 +154,16 @@ exit 0
 %files utils
 %{_bindir}/pipewire-monitor
 %{_bindir}/pipewire-cli
-%{_mandir}/man1/pipewire.conf.5*
+%{_mandir}/man5/pipewire.conf.5*
 %{_mandir}/man1/pipewire-monitor.1*
 %{_mandir}/man1/pipewire-cli.1*
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Nov 22 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.4-1
+- Update to 0.2.4
+
 * Thu Oct 18 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.3-2
 - Add systemd socket activation
 
