@@ -14,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.4
+Version:        0.2.5
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
@@ -69,6 +69,7 @@ systems.
 %package libs
 Summary:        Libraries for PipeWire clients
 License:        LGPLv2+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for any application that wishes
@@ -77,6 +78,7 @@ to interface with a PipeWire media server.
 %package devel
 Summary:        Headers and libraries for PipeWire client development
 License:        LGPLv2+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description devel
 Headers and libraries for developing applications that can communicate with
@@ -92,6 +94,7 @@ This package contains documentation for the PipeWire media server.
 %package utils
 Summary:        PipeWire media server utilities
 License:        LGPLv2+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description utils
@@ -161,6 +164,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Nov 22 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.5-1
+- Update to 0.2.5
+
 * Thu Nov 22 2018 Wim Taymans <wtaymans@redhat.com> - 0.2.4-1
 - Update to 0.2.4
 
