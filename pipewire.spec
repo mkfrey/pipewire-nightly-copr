@@ -27,7 +27,7 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
 %endif
 
 ## upstream patches
-
+Patch0:		0001-alsa-handle-alsa-lib-1.1.9.patch
 
 ## upstreamable patches
 
@@ -103,6 +103,8 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
+%patch0 -p1 -b .0000
+
 %build
 %meson -D docs=true -D man=true -D gstreamer=enabled -D systemd=true
 %meson_build
@@ -166,6 +168,7 @@ exit 0
 %changelog
 * Wed May 22 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.6-1
 - Update to 0.2.6
+- Add patch for alsa-lib 1.1.9 include path
 
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
