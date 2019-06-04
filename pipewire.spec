@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.6
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -69,7 +69,7 @@ systems.
 %package libs
 Summary:        Libraries for PipeWire clients
 License:        LGPLv2+
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for any application that wishes
@@ -124,7 +124,7 @@ getent passwd pipewire >/dev/null || \
     useradd -r -g pipewire -d %{_localstatedir}/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
 exit 0
 
-%ldconfig_scriptlets
+%ldconfig_scriptlets -n libs
 
 %files
 %license LICENSE GPL LGPL
@@ -134,17 +134,17 @@ exit 0
 %{_userunitdir}/sockets.target.wants/pipewire.socket
 %endif
 %{_bindir}/pipewire
-%{_libdir}/libpipewire-%{apiversion}.so.*
-%{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/pipewire-%{apiversion}/
 %{_libdir}/spa/
 %{_mandir}/man1/pipewire.1*
+%dir %{_sysconfdir}/pipewire/
 %{_sysconfdir}/pipewire/pipewire.conf
 
 %files libs
 %license LICENSE GPL LGPL
 %doc README
-%dir %{_sysconfdir}/pipewire/
+%{_libdir}/gstreamer-1.0/libgstpipewire.*
+%{_libdir}/libpipewire-%{apiversion}.so.*
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
@@ -166,6 +166,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Tue Jun 04 2019 Kalev Lember <klember@redhat.com> - 0.2.6-2
+- Split libpipewire and the gstreamer plugin out to -libs subpackage
+
 * Wed May 22 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.6-1
 - Update to 0.2.6
 - Add patch for alsa-lib 1.1.9 include path
