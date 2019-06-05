@@ -124,7 +124,7 @@ getent passwd pipewire >/dev/null || \
     useradd -r -g pipewire -d %{_localstatedir}/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
 exit 0
 
-%ldconfig_scriptlets -n libs
+%ldconfig_scriptlets libs
 
 %files
 %license LICENSE GPL LGPL
