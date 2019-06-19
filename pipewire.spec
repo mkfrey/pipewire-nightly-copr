@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.6
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -28,6 +28,9 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
 
 ## upstream patches
 Patch0:		0001-alsa-handle-alsa-lib-1.1.9.patch
+Patch1:		0002-connection-add-do_close-flag-to-connect_fd.patch
+Patch2:		0003-deviceprovider-fix-probing-without-starting.patch
+Patch3:		0004-Revert-global-combine-all-permissions-of-the-object-.patch
 
 ## upstreamable patches
 
@@ -104,6 +107,9 @@ This package contains command line utilities for the PipeWire media server.
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
+%patch1 -p1 -b .0001
+%patch2 -p1 -b .0002
+%patch3 -p1 -b .0003
 
 %build
 %meson -D docs=true -D man=true -D gstreamer=enabled -D systemd=true
@@ -166,6 +172,11 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Wed Jun 19 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.6-3
+- Add patch to reuse fd in pipewiresrc
+- Add patch for device provider
+- Add patch to disable extra security checks until portal is fixed.
+
 * Tue Jun 04 2019 Kalev Lember <klember@redhat.com> - 0.2.6-2
 - Split libpipewire and the gstreamer plugin out to -libs subpackage
 
