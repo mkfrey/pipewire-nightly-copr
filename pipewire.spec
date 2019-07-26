@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.6
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -172,6 +172,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Wed Jun 19 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.6-3
 - Add patch to reuse fd in pipewiresrc
 - Add patch for device provider
