@@ -144,6 +144,7 @@ exit 0
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %{_sysconfdir}/pipewire/pipewire.conf
+%{_mandir}/man5/pipewire.conf.5*
 
 %files libs
 %license LICENSE GPL LGPL
@@ -164,7 +165,6 @@ exit 0
 %files utils
 %{_bindir}/pipewire-monitor
 %{_bindir}/pipewire-cli
-%{_mandir}/man5/pipewire.conf.5*
 %{_mandir}/man1/pipewire-monitor.1*
 %{_mandir}/man1/pipewire-cli.1*
 %{_bindir}/spa-monitor
@@ -173,6 +173,7 @@ exit 0
 %changelog
 * Mon Sep 16 2019 Kalev Lember <klember@redhat.com> - 0.2.6-5
 - Don't require the daemon package for -devel subpackage
+- Move pipewire.conf man page to the daemon package
 
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
