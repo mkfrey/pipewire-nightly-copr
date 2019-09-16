@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.6
-Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        5%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -81,7 +81,6 @@ to interface with a PipeWire media server.
 %package devel
 Summary:        Headers and libraries for PipeWire client development
 License:        LGPLv2+
-Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description devel
 Headers and libraries for developing applications that can communicate with
@@ -172,6 +171,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Mon Sep 16 2019 Kalev Lember <klember@redhat.com> - 0.2.6-5
+- Don't require the daemon package for -devel subpackage
+
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
