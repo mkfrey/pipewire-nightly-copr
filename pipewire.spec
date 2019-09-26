@@ -14,8 +14,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.6
-Release:        5%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.2.7
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -23,14 +23,10 @@ URL:            https://pipewire.org/
 # cd pipewire; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
 Source0:        pipewire-%{version}-%{gitrel}-g%{shortcommit}.tar.gz
 %else
-Source0:	https://github.com/PipeWire/pipewire/archive/%{version}.tar.gz
+Source0:	https://github.com/PipeWire/pipewire/archive/%{version}/pipewire-%{version}.tar.gz
 %endif
 
 ## upstream patches
-Patch0:		0001-alsa-handle-alsa-lib-1.1.9.patch
-Patch1:		0002-connection-add-do_close-flag-to-connect_fd.patch
-Patch2:		0003-deviceprovider-fix-probing-without-starting.patch
-Patch3:		0004-Revert-global-combine-all-permissions-of-the-object-.patch
 
 ## upstreamable patches
 
@@ -105,11 +101,6 @@ This package contains command line utilities for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
-%patch3 -p1 -b .0003
-
 %build
 %meson -D docs=true -D man=true -D gstreamer=enabled -D systemd=true
 %meson_build
@@ -171,6 +162,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Sep 26 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.7-1
+- Update to 0.2.7
+
 * Mon Sep 16 2019 Kalev Lember <klember@redhat.com> - 0.2.6-5
 - Don't require the daemon package for -devel subpackage
 - Move pipewire.conf man page to the daemon package
