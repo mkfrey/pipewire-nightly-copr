@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.7
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        LGPLv2+
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -131,7 +131,6 @@ exit 0
 %endif
 %{_bindir}/pipewire
 %{_libdir}/pipewire-%{apiversion}/
-%{_libdir}/spa/
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %{_sysconfdir}/pipewire/pipewire.conf
@@ -142,6 +141,7 @@ exit 0
 %doc README
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/libpipewire-%{apiversion}.so.*
+%{_libdir}/spa/
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
@@ -162,6 +162,9 @@ exit 0
 %{_bindir}/spa-inspect
 
 %changelog
+* Thu Nov 28 2019 Kalev Lember <klember@redhat.com> - 0.2.7-2
+- Move spa plugins to -libs subpackage
+
 * Thu Sep 26 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.7-1
 - Update to 0.2.7
 
