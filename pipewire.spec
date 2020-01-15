@@ -14,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.91
+Version:        0.2.92
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -27,8 +27,6 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}/pipewire-%{vers
 %endif
 
 ## upstream patches
-Patch0: 	0001-protocol-improve-old-version-check.patch
-Patch1:		0001-Fix-some-unit-test.patch
 
 ## upstreamable patches
 
@@ -134,9 +132,6 @@ This package contains a PulseAudio library for the PipeWire media server.
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-
 %build
 %meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
 %meson_build
@@ -203,11 +198,16 @@ exit 0
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 
 %files jack
+%{_libdir}/libjack.so*
 
 %files pulseaudio
-
+%{_libdir}/libpulse.so*
+%{_libdir}/libpulse-mainloop-glib.so*
 
 %changelog
+* Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.92-1
+- Update to 0.2.91
+
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
 - Update to 0.2.91
 - Add some more BR
