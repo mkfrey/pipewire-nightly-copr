@@ -205,7 +205,7 @@ exit 0
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
 - Update to 0.2.91
 
-* Mon Jan 13 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.90-1
+* Mon Jan 13 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.90-1
 - Update to 0.2.90
 
 * Thu Nov 28 2019 Kalev Lember <klember@redhat.com> - 0.2.7-2
