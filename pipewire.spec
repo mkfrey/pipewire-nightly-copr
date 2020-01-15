@@ -43,6 +43,8 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
+BuildRequires:  pkgconfig(vulkan)
+BuildRequires:  pkgconfig(bluez)
 BuildRequires:  systemd-devel >= 184
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
@@ -50,6 +52,8 @@ BuildRequires:  doxygen
 BuildRequires:  xmltoman
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
+BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
+BuildRequires:  pulseaudio-libs-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -204,6 +208,7 @@ exit 0
 %changelog
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
 - Update to 0.2.91
+- Add some more BR
 
 * Mon Jan 13 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.90-1
 - Update to 0.2.90
