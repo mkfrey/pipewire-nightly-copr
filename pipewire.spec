@@ -1,4 +1,4 @@
-%global apiversion   0.2
+%global apiversion   0.3
 %global spaversion   0.1
 
 #global snap       20141103
@@ -14,9 +14,9 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.7
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
-License:        LGPLv2+
+Version:        0.2.91
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
 # git clone git://anongit.freedesktop.org/gstreamer/pipewire
@@ -27,6 +27,7 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}/pipewire-%{vers
 %endif
 
 ## upstream patches
+Patch0: 	0001-protocol-improve-old-version-check.patch
 
 ## upstreamable patches
 
@@ -67,7 +68,7 @@ systems.
 
 %package libs
 Summary:        Libraries for PipeWire clients
-License:        LGPLv2+
+License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 
 %description libs
@@ -76,7 +77,7 @@ to interface with a PipeWire media server.
 
 %package devel
 Summary:        Headers and libraries for PipeWire client development
-License:        LGPLv2+
+License:        MIT
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description devel
 Headers and libraries for developing applications that can communicate with
@@ -84,25 +85,54 @@ a PipeWire media server.
 
 %package doc
 Summary:        PipeWire media server documentation
-License:        LGPLv2+
+License:        MIT
 
 %description doc
 This package contains documentation for the PipeWire media server.
 
 %package utils
 Summary:        PipeWire media server utilities
-License:        LGPLv2+
+License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
+%package alsa
+Summary:        PipeWire media server ALSA support
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description alsa
+This package contains an ALSA plugin for the PipeWire media server.
+
+%package jack
+Summary:        PipeWire media server JACK support
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description jack
+This package contains a JACK library for the PipeWire media server.
+
+%package pulseaudio
+Summary:        PipeWire media server PulseAudio support
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description pulseaudio
+This package contains a PulseAudio library for the PipeWire media server.
+
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
+%patch0 -p1 -b .0000
+
 %build
-%meson -D docs=true -D man=true -D gstreamer=enabled -D systemd=true
+%meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
 %meson_build
 
 %install
@@ -123,13 +153,14 @@ exit 0
 %ldconfig_scriptlets libs
 
 %files
-%license LICENSE GPL LGPL
-%doc README
+%license LICENSE COPYING
+%doc README.md
 %if 0%{?systemd}
 %{_userunitdir}/pipewire.*
 %{_userunitdir}/sockets.target.wants/pipewire.socket
 %endif
 %{_bindir}/pipewire
+%{_bindir}/pipewire-media-session
 %{_libdir}/pipewire-%{apiversion}/
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
@@ -137,8 +168,8 @@ exit 0
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs
-%license LICENSE GPL LGPL
-%doc README
+%license LICENSE COPYING
+%doc README.md
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/libpipewire-%{apiversion}.so.*
 %{_libdir}/spa/
@@ -156,12 +187,27 @@ exit 0
 %files utils
 %{_bindir}/pipewire-monitor
 %{_bindir}/pipewire-cli
+%{_bindir}/pipewire-dot
 %{_mandir}/man1/pipewire-monitor.1*
 %{_mandir}/man1/pipewire-cli.1*
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
+%files alsa
+%{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
+
+%files jack
+
+%files pulseaudio
+
+
 %changelog
+* Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
+- Update to 0.2.91
+
+* Mon Jan 13 2019 Wim Taymans <wtaymans@redhat.com> - 0.2.90-1
+- Update to 0.2.90
+
 * Thu Nov 28 2019 Kalev Lember <klember@redhat.com> - 0.2.7-2
 - Move spa plugins to -libs subpackage
 
