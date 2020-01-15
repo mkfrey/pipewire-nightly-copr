@@ -1,0 +1,244 @@
+From 4e8d85da2f6c759e14ee3dbba4ec1a08ed754e9d Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Wed, 15 Jan 2020 13:23:49 +0100
+Subject: [PATCH] Fix some unit test
+
+Run abi checks only on x86_64 until we have sizes for more archs
+Don't start a daemon in the tests because that would require
+XDG_RUNTIME_DIR set
+---
+ spa/tests/test-buffer.c     | 16 ++++++++++++++--
+ spa/tests/test-node.c       | 28 ++++++++++++++++++++++++++--
+ spa/tests/test-pod.c        |  2 ++
+ spa/tests/test-utils.c      |  2 ++
+ src/tests/test-array.c      |  4 ++++
+ src/tests/test-properties.c |  4 ++++
+ src/tests/test-stream.c     | 15 +++++++--------
+ 7 files changed, 59 insertions(+), 12 deletions(-)
+
+diff --git a/spa/tests/test-buffer.c b/spa/tests/test-buffer.c
+index 3e0e01b6..7a568e51 100644
+--- a/spa/tests/test-buffer.c
++++ b/spa/tests/test-buffer.c
+@@ -36,9 +36,15 @@ static void test_abi(void)
+ 	spa_assert(SPA_DATA_MemId == 4);
+ 	spa_assert(SPA_DATA_LAST == 5);
+ 
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_chunk) == 16);
+ 	spa_assert(sizeof(struct spa_data) == 40);
+ 	spa_assert(sizeof(struct spa_buffer) == 24);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct spa_chunk));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_data));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_buffer));
++#endif
+ 
+ 	/* meta */
+ 	spa_assert(SPA_META_Invalid == 0);
+@@ -50,13 +56,19 @@ static void test_abi(void)
+ 	spa_assert(SPA_META_Control == 6);
+ 	spa_assert(SPA_META_LAST == 7);
+ 
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_meta) == 16);
+-	fprintf(stderr, "%zd", sizeof(struct spa_meta_header));
+ 	spa_assert(sizeof(struct spa_meta_header) == 32);
+ 	spa_assert(sizeof(struct spa_meta_region) == 16);
+ 	spa_assert(sizeof(struct spa_meta_bitmap) == 20);
+ 	spa_assert(sizeof(struct spa_meta_cursor) == 28);
+-
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct spa_meta));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_meta_header));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_meta_region));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_meta_bitmap));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_meta_cursor));
++#endif
+ }
+ 
+ static void test_alloc(void)
+diff --git a/spa/tests/test-node.c b/spa/tests/test-node.c
+index 9a8d23fc..9c35783f 100644
+--- a/spa/tests/test-node.c
++++ b/spa/tests/test-node.c
+@@ -42,6 +42,7 @@ static void test_io_abi(void)
+ 	spa_assert(SPA_IO_RateMatch == 8);
+ 	spa_assert(SPA_IO_Memory == 9);
+ 
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_io_buffers) == 8);
+ 	spa_assert(sizeof(struct spa_io_memory) == 16);
+ 	spa_assert(sizeof(struct spa_io_range) == 16);
+@@ -50,17 +51,31 @@ static void test_io_abi(void)
+ 	spa_assert(sizeof(struct spa_io_sequence) == 16);
+ 	spa_assert(sizeof(struct spa_io_segment_bar) == 64);
+ 	spa_assert(sizeof(struct spa_io_segment_video) == 80);
+-	fprintf(stderr, "%zd", sizeof(struct spa_io_segment));
+ 	spa_assert(sizeof(struct spa_io_segment) == 184);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_buffers));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_memory));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_range));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_clock));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_latency));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_sequence));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_segment_bar));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_segment_video));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_segment));
++#endif
+ 
+ 	/* position state */
+ 	spa_assert(SPA_IO_POSITION_STATE_STOPPED == 0);
+ 	spa_assert(SPA_IO_POSITION_STATE_STARTING == 1);
+ 	spa_assert(SPA_IO_POSITION_STATE_RUNNING == 2);
+ 
+-	fprintf(stderr, "%zd", sizeof(struct spa_io_position));
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_io_position) == 1688);
+ 	spa_assert(sizeof(struct spa_io_rate_match) == 48);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_position));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_io_rate_match));
++#endif
+ }
+ 
+ static void test_command_abi(void)
+@@ -195,11 +210,20 @@ static void test_node_abi(void)
+ 	spa_assert(SPA_NODE_METHOD_NUM == 15);
+ 	spa_assert(sizeof(m) == sizeof(methods));
+ 
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_node_info) == 48);
+ 	spa_assert(sizeof(struct spa_port_info) == 48);
+ 
+ 	spa_assert(sizeof(struct spa_result_node_error) == 8);
+ 	spa_assert(sizeof(struct spa_result_node_params) == 24);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct spa_node_info));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_port_info));
++
++	fprintf(stderr, "%zd\n", sizeof(struct spa_result_node_error));
++	fprintf(stderr, "%zd\n", sizeof(struct spa_result_node_params));
++#endif
++
+ }
+ 
+ int main(int argc, char *argv[])
+diff --git a/spa/tests/test-pod.c b/spa/tests/test-pod.c
+index 31cc7696..bb06f12c 100644
+--- a/spa/tests/test-pod.c
++++ b/spa/tests/test-pod.c
+@@ -35,6 +35,7 @@
+ static void test_abi(void)
+ {
+ 	/* pod */
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct spa_pod) == 8);
+ 	spa_assert(sizeof(struct spa_pod_bool) == 16);
+ 	spa_assert(sizeof(struct spa_pod_id) == 16);
+@@ -85,6 +86,7 @@ static void test_abi(void)
+ 	/* parser */
+ 	spa_assert(sizeof(struct spa_pod_parser_state) == 16);
+ 	spa_assert(sizeof(struct spa_pod_parser) == 32);
++#endif
+ 
+ }
+ 
+diff --git a/spa/tests/test-utils.c b/spa/tests/test-utils.c
+index b2c33c5e..76c6d399 100644
+--- a/spa/tests/test-utils.c
++++ b/spa/tests/test-utils.c
+@@ -63,6 +63,7 @@ static void test_abi(void)
+ 		spa_assert(f.denom == 125);
+ 	}
+ 
++#if defined(__x86_64__)
+ 	/* dict */
+ 	spa_assert(sizeof(struct spa_dict_item) == 16);
+ 	spa_assert(sizeof(struct spa_dict) == 16);
+@@ -73,6 +74,7 @@ static void test_abi(void)
+ 
+ 	/* list */
+ 	spa_assert(sizeof(struct spa_list) == 16);
++#endif
+ 
+ 	/* ringbuffer */
+ 	spa_assert(sizeof(struct spa_ringbuffer) == 8);
+diff --git a/src/tests/test-array.c b/src/tests/test-array.c
+index 6ce5fb51..f65de6d3 100644
+--- a/src/tests/test-array.c
++++ b/src/tests/test-array.c
+@@ -27,7 +27,11 @@
+ static void test_abi(void)
+ {
+ 	/* array */
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct pw_array) == 32);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct pw_array));
++#endif
+ }
+ 
+ static void test_array(void)
+diff --git a/src/tests/test-properties.c b/src/tests/test-properties.c
+index 9162f555..9b246cb6 100644
+--- a/src/tests/test-properties.c
++++ b/src/tests/test-properties.c
+@@ -26,7 +26,11 @@
+ 
+ static void test_abi(void)
+ {
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct pw_properties) == 24);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct pw_properties));
++#endif
+ }
+ 
+ static void test_empty(void)
+diff --git a/src/tests/test-stream.c b/src/tests/test-stream.c
+index e26f84c6..f9edfd3b 100644
+--- a/src/tests/test-stream.c
++++ b/src/tests/test-stream.c
+@@ -59,8 +59,13 @@ static void test_abi(void)
+ 	TEST_FUNC(ev, test, process);
+ 	TEST_FUNC(ev, test, drained);
+ 
++#if defined(__x86_64__)
+ 	spa_assert(sizeof(struct pw_buffer) == 24);
+ 	spa_assert(sizeof(struct pw_time) == 40);
++#else
++	fprintf(stderr, "%zd\n", sizeof(struct pw_buffer));
++	fprintf(stderr, "%zd\n", sizeof(struct pw_time));
++#endif
+ 
+ 	spa_assert(PW_VERSION_STREAM_EVENTS == 0);
+ 	spa_assert(sizeof(ev) == sizeof(test));
+@@ -142,10 +147,7 @@ static void test_create(void)
+ 	struct pw_time tm;
+ 
+ 	loop = pw_main_loop_new(NULL);
+-	context = pw_context_new(pw_main_loop_get_loop(loop),
+-			pw_properties_new(
+-				PW_KEY_CORE_DAEMON, "1",
+-				NULL), 12);
++	context = pw_context_new(pw_main_loop_get_loop(loop), NULL, 12);
+ 	spa_assert(context != NULL);
+ 	core = pw_context_connect_self(context, NULL, 0);
+ 	spa_assert(core != NULL);
+@@ -194,10 +196,7 @@ static void test_properties(void)
+ 	struct spa_dict_item items[3];
+ 
+ 	loop = pw_main_loop_new(NULL);
+-	context = pw_context_new(pw_main_loop_get_loop(loop),
+-			pw_properties_new(
+-				PW_KEY_CORE_DAEMON, "1",
+-				NULL), 12);
++	context = pw_context_new(pw_main_loop_get_loop(loop), NULL, 12);
+ 	spa_assert(context != NULL);
+ 	core = pw_context_connect_self(context, NULL, 0);
+ 	spa_assert(core != NULL);
+-- 
+2.24.1
+

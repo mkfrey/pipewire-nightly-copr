@@ -28,6 +28,7 @@ Source0:	https://github.com/PipeWire/pipewire/archive/%{version}/pipewire-%{vers
 
 ## upstream patches
 Patch0: 	0001-protocol-improve-old-version-check.patch
+Patch1:		0001-Fix-some-unit-test.patch
 
 ## upstreamable patches
 
@@ -134,6 +135,7 @@ This package contains a PulseAudio library for the PipeWire media server.
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
+%patch1 -p1 -b .0001
 
 %build
 %meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
@@ -209,6 +211,7 @@ exit 0
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
 - Update to 0.2.91
 - Add some more BR
+- Fix some unit tests
 
 * Mon Jan 13 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.90-1
 - Update to 0.2.90
