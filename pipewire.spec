@@ -51,6 +51,7 @@ BuildRequires:  doxygen
 BuildRequires:  xmltoman
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
+BuildRequires:  libsndfile-devel
 BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
 BuildRequires:  pulseaudio-libs-devel
 
@@ -213,6 +214,7 @@ exit 0
 - Update to 0.2.94
 - Move pipewire modules to -libs
 - Add pw-profiler
+- Add libsndfile-devel as a BR
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.92-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
