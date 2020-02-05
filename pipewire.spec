@@ -1,5 +1,5 @@
 %global apiversion   0.3
-%global spaversion   0.1
+%global spaversion   0.2
 
 #global snap       20141103
 #global gitrel     327
@@ -14,8 +14,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.92
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.2.94
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -162,7 +162,6 @@ exit 0
 %endif
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
-%{_libdir}/pipewire-%{apiversion}/
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %{_sysconfdir}/pipewire/pipewire.conf
@@ -173,12 +172,13 @@ exit 0
 %doc README.md
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/libpipewire-%{apiversion}.so.*
-%{_libdir}/spa/
+%{_libdir}/pipewire-%{apiversion}/
+%{_libdir}/spa-%{spaversion}/
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
-%{_includedir}/pipewire/
-%{_includedir}/spa/
+%{_includedir}/pipewire-%{apiversion}/
+%{_includedir}/spa-%{spaversion}/
 %{_libdir}/pkgconfig/libpipewire-%{apiversion}.pc
 %{_libdir}/pkgconfig/libspa-%{spaversion}.pc
 
@@ -186,11 +186,15 @@ exit 0
 %{_datadir}/doc/pipewire/html
 
 %files utils
-%{_bindir}/pipewire-monitor
-%{_bindir}/pipewire-cli
-%{_bindir}/pipewire-dot
-%{_mandir}/man1/pipewire-monitor.1*
-%{_mandir}/man1/pipewire-cli.1*
+%{_bindir}/pw-mon
+%{_bindir}/pw-cli
+%{_bindir}/pw-dot
+%{_bindir}/pw-cat
+%{_bindir}/pw-play
+%{_bindir}/pw-profiler
+%{_bindir}/pw-record
+%{_mandir}/man1/pw-mon.1*
+%{_mandir}/man1/pw-cli.1*
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
@@ -198,18 +202,26 @@ exit 0
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 
 %files jack
-%{_libdir}/libjack.so*
+%{_libdir}/libjack-pw.so*
 
 %files pulseaudio
-%{_libdir}/libpulse.so*
-%{_libdir}/libpulse-mainloop-glib.so*
+%{_libdir}/libpulse-pw.so*
+%{_libdir}/libpulse-mainloop-glib-pw.so*
 
 %changelog
+* Tue Feb 05 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.94-1
+- Update to 0.2.94
+- Move pipewire modules to -libs
+- Add pw-profiler
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.92-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
+* Tue Jan 28 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.93-1
+- Update to 0.2.93
+
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.92-1
-- Update to 0.2.91
+- Update to 0.2.92
 
 * Wed Jan 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.91-1
 - Update to 0.2.91
