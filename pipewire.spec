@@ -144,7 +144,9 @@ mkdir %{buildroot}%{_userunitdir}/sockets.target.wants
 ln -s ../pipewire.socket %{buildroot}%{_userunitdir}/sockets.target.wants/pipewire.socket
 
 %check
+%ifnarch aarch64
 %meson_test
+%endif
 
 %pre
 getent group pipewire >/dev/null || groupadd -r pipewire
@@ -212,6 +214,7 @@ exit 0
 %changelog
 * Tue Feb 07 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.95-1
 - Update to 0.2.95
+- Disable test on aarch64 for now
 
 * Tue Feb 05 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.94-1
 - Update to 0.2.94
