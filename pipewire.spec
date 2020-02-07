@@ -14,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.94
+Version:        0.2.95
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -210,6 +210,9 @@ exit 0
 %{_libdir}/libpulse-mainloop-glib-pw.so*
 
 %changelog
+* Tue Feb 07 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.95-1
+- Update to 0.2.95
+
 * Tue Feb 05 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.94-1
 - Update to 0.2.94
 - Move pipewire modules to -libs
