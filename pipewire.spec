@@ -14,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.95
+Version:        0.2.96
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -78,6 +78,15 @@ Recommends:     %{name}%{?_isa} = %{version}-%{release}
 %description libs
 This package contains the runtime libraries for any application that wishes
 to interface with a PipeWire media server.
+
+%package gstreamer
+Summary:        GStreamer elements for PipeWire
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+
+%description gstreamer
+This package contains GStreamer elements to interface with a
+PipeWire media server.
 
 %package devel
 Summary:        Headers and libraries for PipeWire client development
@@ -144,9 +153,7 @@ mkdir %{buildroot}%{_userunitdir}/sockets.target.wants
 ln -s ../pipewire.socket %{buildroot}%{_userunitdir}/sockets.target.wants/pipewire.socket
 
 %check
-%ifnarch aarch64
 %meson_test
-%endif
 
 %pre
 getent group pipewire >/dev/null || groupadd -r pipewire
@@ -173,10 +180,12 @@ exit 0
 %files libs
 %license LICENSE COPYING
 %doc README.md
-%{_libdir}/gstreamer-1.0/libgstpipewire.*
 %{_libdir}/libpipewire-%{apiversion}.so.*
 %{_libdir}/pipewire-%{apiversion}/
 %{_libdir}/spa-%{spaversion}/
+
+%files gstreamer
+%{_libdir}/gstreamer-1.0/libgstpipewire.*
 
 %files devel
 %{_libdir}/libpipewire-%{apiversion}.so
@@ -212,11 +221,16 @@ exit 0
 %{_libdir}/libpulse-mainloop-glib-pw.so*
 
 %changelog
-* Tue Feb 07 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.95-1
+* Tue Feb 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.96-1
+- Update to 0.2.96
+- Split -gstreamer package
+- Enable aarch64 tests again
+
+* Fri Feb 07 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.95-1
 - Update to 0.2.95
 - Disable test on aarch64 for now
 
-* Tue Feb 05 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.94-1
+* Wed Feb 05 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.94-1
 - Update to 0.2.94
 - Move pipewire modules to -libs
 - Add pw-profiler
