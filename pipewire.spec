@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.2.96
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -121,23 +121,28 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description alsa
 This package contains an ALSA plugin for the PipeWire media server.
 
-%package jack
-Summary:        PipeWire media server JACK support
+%package libjack
+Summary:        PipeWire libjack library
 License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+# Renamed in F32
+Obsoletes:      pipewire-jack < 0.2.96-2
 
-%description jack
-This package contains a JACK library for the PipeWire media server.
+%description libjack
+This package contains a PipeWire replacement for JACK audio connection kit
+"libjack" library.
 
-%package pulseaudio
-Summary:        PipeWire media server PulseAudio support
+%package libpulse
+Summary:        PipeWire libpulse library
 License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+# Renamed in F32
+Obsoletes:      pipewire-pulseaudio < 0.2.96-2
 
-%description pulseaudio
-This package contains a PulseAudio library for the PipeWire media server.
+%description libpulse
+This package contains a PipeWire replacement for PulseAudio "libpulse" library.
 
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
@@ -213,14 +218,18 @@ exit 0
 %files alsa
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 
-%files jack
+%files libjack
 %{_libdir}/libjack-pw.so*
 
-%files pulseaudio
+%files libpulse
 %{_libdir}/libpulse-pw.so*
 %{_libdir}/libpulse-mainloop-glib-pw.so*
 
 %changelog
+* Tue Feb 18 2020 Kalev Lember <klember@redhat.com> - 0.2.96-2
+- Rename subpackages so that libjack-pw is in -libjack
+  and libpulse-pw is in -libpulse
+
 * Tue Feb 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.96-1
 - Update to 0.2.96
 - Split -gstreamer package
