@@ -144,6 +144,15 @@ Obsoletes:      pipewire-pulseaudio < 0.2.96-2
 %description libpulse
 This package contains a PipeWire replacement for PulseAudio "libpulse" library.
 
+%package plugin-jack
+Summary:        PipeWire media server JACK support
+License:        MIT
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description plugin-jack
+This package contains the PipeWire spa plugin to connect to a JACK server.
+
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
@@ -187,7 +196,16 @@ exit 0
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
 %{_libdir}/pipewire-%{apiversion}/
-%{_libdir}/spa-%{spaversion}/
+%dir %{_libdir}/spa-%{spaversion}
+%{_libdir}/spa-%{spaversion}/alsa/
+%{_libdir}/spa-%{spaversion}/audioconvert/
+%{_libdir}/spa-%{spaversion}/audiomixer/
+%{_libdir}/spa-%{spaversion}/bluez5/
+%{_libdir}/spa-%{spaversion}/control/
+%{_libdir}/spa-%{spaversion}/support/
+%{_libdir}/spa-%{spaversion}/v4l2/
+%{_libdir}/spa-%{spaversion}/videoconvert/
+%{_libdir}/spa-%{spaversion}/vulkan/
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
@@ -225,10 +243,14 @@ exit 0
 %{_libdir}/libpulse-pw.so*
 %{_libdir}/libpulse-mainloop-glib-pw.so*
 
+%files plugin-jack
+%{_libdir}/spa-%{spaversion}/jack/
+
 %changelog
 * Tue Feb 18 2020 Kalev Lember <klember@redhat.com> - 0.2.96-2
 - Rename subpackages so that libjack-pw is in -libjack
   and libpulse-pw is in -libpulse
+- Split libspa-jack.so out to -plugin-jack subpackage
 
 * Tue Feb 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.96-1
 - Update to 0.2.96
