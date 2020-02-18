@@ -115,7 +115,7 @@ This package contains command line utilities for the PipeWire media server.
 %package alsa
 Summary:        PipeWire media server ALSA support
 License:        MIT
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description alsa
@@ -124,7 +124,7 @@ This package contains an ALSA plugin for the PipeWire media server.
 %package libjack
 Summary:        PipeWire libjack library
 License:        MIT
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # Renamed in F32
 Obsoletes:      pipewire-jack < 0.2.96-2
@@ -136,7 +136,7 @@ This package contains a PipeWire replacement for JACK audio connection kit
 %package libpulse
 Summary:        PipeWire libpulse library
 License:        MIT
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 # Renamed in F32
 Obsoletes:      pipewire-pulseaudio < 0.2.96-2
@@ -147,7 +147,7 @@ This package contains a PipeWire replacement for PulseAudio "libpulse" library.
 %package plugin-jack
 Summary:        PipeWire media server JACK support
 License:        MIT
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description plugin-jack
@@ -251,6 +251,7 @@ exit 0
 - Rename subpackages so that libjack-pw is in -libjack
   and libpulse-pw is in -libpulse
 - Split libspa-jack.so out to -plugin-jack subpackage
+- Avoid hard-requiring the daemon from any of the library subpackages
 
 * Tue Feb 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.96-1
 - Update to 0.2.96
