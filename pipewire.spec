@@ -14,8 +14,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.2.96
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.2.97
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -23,7 +23,7 @@ URL:            https://pipewire.org/
 # cd pipewire; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
 Source0:        pipewire-%{version}-%{gitrel}-g%{shortcommit}.tar.gz
 %else
-Source0:	https://github.com/PipeWire/pipewire/archive/%{version}/pipewire-%{version}.tar.gz
+Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
 %endif
 
 ## upstream patches
@@ -247,6 +247,10 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Wed Feb 19 2020 Wim Taymans <wtaymans@redhat.com> - 0.2.97-1
+- Update to 0.2.97
+- Change download link
+
 * Tue Feb 18 2020 Kalev Lember <klember@redhat.com> - 0.2.96-2
 - Rename subpackages so that libjack-pw is in -libjack
   and libpulse-pw is in -libpulse
