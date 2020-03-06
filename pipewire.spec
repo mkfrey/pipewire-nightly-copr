@@ -14,7 +14,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.0
+Version:        0.3.1
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -248,6 +248,9 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Fri Mar 06 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.1-1
+- Update to 0.3.1
+
 * Thu Feb 20 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.0-1
 - Update to 0.3.0
 - Add libpulse-simple-pw.so
