@@ -1,0 +1,24 @@
+From 642368d53f8a9d061bae94673c7f83e5cdfbe3a5 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 30 Mar 2020 15:32:04 +0200
+Subject: [PATCH 2/2] conf: disable alsa-pcm,alsa-seq and bluez5
+
+Disable alsa and bluetooth handling by default to avoid causing
+conflicts with pulseaudio.
+---
+ src/daemon/pipewire.conf.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/pipewire.conf.in b/src/daemon/pipewire.conf.in
+index 75135420..acf15e22 100644
+--- a/src/daemon/pipewire.conf.in
++++ b/src/daemon/pipewire.conf.in
+@@ -69,4 +69,4 @@ load-module libpipewire-module-session-manager
+ # Execute the given program. This is usually used to start the
+ # session manager.
+ #
+-exec pipewire-media-session
++exec pipewire-media-session -d alsa-seq,alsa-pcm,bluez5
+-- 
+2.25.1
+
