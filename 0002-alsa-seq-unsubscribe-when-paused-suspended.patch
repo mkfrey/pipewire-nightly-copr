@@ -1,0 +1,190 @@
+From 7be17a5a9ce98338f52da4026fb57a39c7578129 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Tue, 31 Mar 2020 12:14:52 +0200
+Subject: [PATCH 2/2] alsa-seq: unsubscribe when paused/suspended
+
+When we are suspended or paused, unsubscribe from the ports so that
+we don't block the hardware devices.
+
+See #225
+---
+ spa/plugins/alsa/alsa-seq-source.c | 24 ++----------
+ spa/plugins/alsa/alsa-seq.c        | 59 +++++++++++++++++++++++++++---
+ spa/plugins/alsa/alsa-seq.h        |  2 +
+ 3 files changed, 58 insertions(+), 27 deletions(-)
+
+diff --git a/spa/plugins/alsa/alsa-seq-source.c b/spa/plugins/alsa/alsa-seq-source.c
+index 299f5e3d..9d09f09e 100644
+--- a/spa/plugins/alsa/alsa-seq-source.c
++++ b/spa/plugins/alsa/alsa-seq-source.c
+@@ -374,18 +374,16 @@ static struct seq_port *alloc_port(struct seq_state *state, struct seq_stream *s
+ 	}
+ 	return NULL;
+ }
++
+ static void free_port(struct seq_state *state, struct seq_port *port)
+ {
+ 	spa_node_emit_port_info(&state->hooks,
+ 			port->direction, port->id, NULL);
+-	port->valid = false;
++	spa_zero(*port);
+ }
+ 
+ static void init_port(struct seq_state *state, struct seq_port *port, const snd_seq_addr_t *addr)
+ {
+-	snd_seq_port_subscribe_t* sub;
+-	int res;
+-
+ 	port->addr = *addr;
+ 	port->info_all = SPA_PORT_CHANGE_MASK_FLAGS |
+ 			SPA_PORT_CHANGE_MASK_PROPS |
+@@ -406,23 +404,7 @@ static void init_port(struct seq_state *state, struct seq_port *port, const snd_
+ 	spa_list_init(&port->free);
+ 	spa_list_init(&port->ready);
+ 
+-	snd_seq_port_subscribe_alloca(&sub);
+-	if (port->direction == SPA_DIRECTION_OUTPUT) {
+-		snd_seq_port_subscribe_set_sender(sub, addr);
+-		snd_seq_port_subscribe_set_dest(sub, &state->event.addr);
+-	} else {
+-		snd_seq_port_subscribe_set_sender(sub, &state->event.addr);
+-		snd_seq_port_subscribe_set_dest(sub, addr);
+-	}
+-	snd_seq_port_subscribe_set_time_update(sub, 1);
+-	snd_seq_port_subscribe_set_time_real(sub, 1);
+-	snd_seq_port_subscribe_set_queue(sub, state->event.queue_id);
+-
+-	if ((res = snd_seq_subscribe_port(state->event.hndl, sub)) < 0) {
+-                spa_log_error(state->log, "can't subscribe to %d:%d - %s",
+-				addr->client, addr->port, snd_strerror(res));
+-	}
+-	spa_log_debug(state->log, "connect: %d.%d: %d", addr->client, addr->port, res);
++	spa_alsa_seq_activate_port(state, port, true);
+ 
+ 	emit_port_info(state, port, true);
+ }
+diff --git a/spa/plugins/alsa/alsa-seq.c b/spa/plugins/alsa/alsa-seq.c
+index 8ec987ae..58639a4f 100644
+--- a/spa/plugins/alsa/alsa-seq.c
++++ b/spa/plugins/alsa/alsa-seq.c
+@@ -376,6 +376,48 @@ static struct seq_port *find_port(struct seq_state *state,
+ 	return NULL;
+ }
+ 
++int spa_alsa_seq_activate_port(struct seq_state *state, struct seq_port *port, bool active)
++{
++	int res;
++	snd_seq_port_subscribe_t* sub;
++
++	spa_log_debug(state->log, "activate: %d.%d: started:%d active:%d wanted:%d",
++			port->addr.client, port->addr.port, state->started, port->active, active);
++
++	if (active && !state->started)
++		return 0;
++	if (port->active == active)
++		return 0;
++
++	snd_seq_port_subscribe_alloca(&sub);
++	if (port->direction == SPA_DIRECTION_OUTPUT) {
++		snd_seq_port_subscribe_set_sender(sub, &port->addr);
++		snd_seq_port_subscribe_set_dest(sub, &state->event.addr);
++	} else {
++		snd_seq_port_subscribe_set_sender(sub, &state->event.addr);
++		snd_seq_port_subscribe_set_dest(sub, &port->addr);
++	}
++
++	if (active) {
++		snd_seq_port_subscribe_set_time_update(sub, 1);
++		snd_seq_port_subscribe_set_time_real(sub, 1);
++		snd_seq_port_subscribe_set_queue(sub, state->event.queue_id);
++		if ((res = snd_seq_subscribe_port(state->event.hndl, sub)) < 0) {
++			spa_log_error(state->log, "can't subscribe to %d:%d - %s",
++				port->addr.client, port->addr.port, snd_strerror(res));
++			active = false;
++		}
++	} else {
++		if ((res = snd_seq_unsubscribe_port(state->event.hndl, sub)) < 0) {
++			spa_log_warn(state->log, "can't unsubscribe from %d:%d - %s",
++				port->addr.client, port->addr.port, snd_strerror(res));
++		}
++	}
++	spa_log_info(state->log, "activate: %d.%d: %d", port->addr.client, port->addr.port, active);
++	port->active = active;
++	return res;
++}
++
+ static struct buffer *peek_buffer(struct seq_state *state,
+ 		struct seq_port *port)
+ {
+@@ -774,13 +816,15 @@ static void reset_buffers(struct seq_state *this, struct seq_port *port)
+ 		}
+ 	}
+ }
+-static void reset_stream(struct seq_state *this, struct seq_stream *stream)
++static void reset_stream(struct seq_state *this, struct seq_stream *stream, bool active)
+ {
+ 	uint32_t i;
+ 	for (i = 0; i < MAX_PORTS; i++) {
+ 		struct seq_port *port = &stream->ports[i];
+-		if (port->valid)
++		if (port->valid) {
+ 			reset_buffers(this, port);
++			spa_alsa_seq_activate_port(this, port, active);
++		}
+ 	}
+ }
+ 
+@@ -825,8 +869,10 @@ int spa_alsa_seq_start(struct seq_state *state)
+ 		state->threshold = state->duration;
+ 	}
+ 
+-	reset_stream(state, &state->streams[SPA_DIRECTION_INPUT]);
+-	reset_stream(state, &state->streams[SPA_DIRECTION_OUTPUT]);
++	state->started = true;
++
++	reset_stream(state, &state->streams[SPA_DIRECTION_INPUT], true);
++	reset_stream(state, &state->streams[SPA_DIRECTION_OUTPUT], true);
+ 
+ 	state->source.func = alsa_on_timeout_event;
+ 	state->source.data = state;
+@@ -839,8 +885,6 @@ int spa_alsa_seq_start(struct seq_state *state)
+ 	init_loop(state);
+ 	set_timers(state);
+ 
+-	state->started = true;
+-
+ 	return 0;
+ }
+ 
+@@ -900,5 +944,8 @@ int spa_alsa_seq_pause(struct seq_state *state)
+ 
+ 	state->started = false;
+ 
++	reset_stream(state, &state->streams[SPA_DIRECTION_INPUT], false);
++	reset_stream(state, &state->streams[SPA_DIRECTION_OUTPUT], false);
++
+ 	return 0;
+ }
+diff --git a/spa/plugins/alsa/alsa-seq.h b/spa/plugins/alsa/alsa-seq.h
+index eb8d3d00..aca7daac 100644
+--- a/spa/plugins/alsa/alsa-seq.h
++++ b/spa/plugins/alsa/alsa-seq.h
+@@ -86,6 +86,7 @@ struct seq_port {
+ 	struct spa_audio_info current_format;
+ 	unsigned int have_format:1;
+ 	unsigned int valid:1;
++	unsigned int active:1;
+ };
+ 
+ struct seq_stream {
+@@ -173,6 +174,7 @@ int spa_alsa_seq_start(struct seq_state *state);
+ int spa_alsa_seq_pause(struct seq_state *state);
+ int spa_alsa_seq_reassign_follower(struct seq_state *state);
+ 
++int spa_alsa_seq_activate_port(struct seq_state *state, struct seq_port *port, bool active);
+ int spa_alsa_seq_recycle_buffer(struct seq_state *state, struct seq_port *port, uint32_t buffer_id);
+ 
+ int spa_alsa_seq_process(struct seq_state *state);
+-- 
+2.25.1
+

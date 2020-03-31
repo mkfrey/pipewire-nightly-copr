@@ -15,7 +15,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.2
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -28,11 +28,12 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## upstream patches
 Patch0:		0001-media-session-add-getopt-support.patch
+Patch1:		0002-alsa-seq-unsubscribe-when-paused-suspended.patch
 
 ## upstreamable patches
 
 ## fedora patches
-Patch1:		0002-conf-disable-alsa-pcm-alsa-seq-and-bluez5.patch
+Patch2:		0003-conf-disable-bluez5.patch
 
 BuildRequires:  meson >= 0.35.0
 BuildRequires:  gcc
@@ -162,6 +163,7 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 
 %patch0 -p1 -b .0000
 %patch1 -p1 -b .0001
+%patch2 -p1 -b .0002
 
 %build
 %meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
@@ -255,6 +257,10 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Tue Mar 31 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.2-3
+- Add patch to unsubscribe unused sequencer ports
+- Change config to only disable bluez5 handling by default.
+
 * Mon Mar 30 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.2-2
 - Add config to disable alsa and bluez5 handling by default.
 
