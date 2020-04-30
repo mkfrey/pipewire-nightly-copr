@@ -14,8 +14,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.2
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.3.4
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -27,13 +27,11 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch0:		0001-media-session-add-getopt-support.patch
-Patch1:		0002-alsa-seq-unsubscribe-when-paused-suspended.patch
 
 ## upstreamable patches
 
 ## fedora patches
-Patch2:		0003-conf-disable-bluez5.patch
+Patch0:		0001-conf-disable-bluez5.patch
 
 BuildRequires:  meson >= 0.35.0
 BuildRequires:  gcc
@@ -138,6 +136,18 @@ Obsoletes:      pipewire-jack < 0.2.96-2
 This package contains a PipeWire replacement for JACK audio connection kit
 "libjack" library.
 
+%package jack-audio-connection-kit
+Summary:        PipeWire JACK implementation
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libjack%{?_isa} = %{version}-%{release}
+Conflicts:      jack-audio-connection-kit
+Conflicts:      jack-audio-connection-kit-dbus
+Provides:       jack-audio-connection-kit
+
+%description jack-audio-connection-kit
+This package provides a JACK implementation based on PipeWire
+
 %package libpulse
 Summary:        PipeWire libpulse library
 License:        MIT
@@ -149,11 +159,25 @@ Obsoletes:      pipewire-pulseaudio < 0.2.96-2
 %description libpulse
 This package contains a PipeWire replacement for PulseAudio "libpulse" library.
 
+%package pulseaudio
+Summary:        PipeWire PulseAudio implementation
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libpulse%{?_isa} = %{version}-%{release}
+Conflicts:      pulseaudio-libs
+Conflicts:      pulseaudio-libs-glib2
+Provides:       pulseaudio-libs
+Provides:       pulseaudio-libs-glib2
+
+%description pulseaudio
+This package provides a PulseAudio implementation based on PipeWire
+
 %package plugin-jack
 Summary:        PipeWire media server JACK support
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       jack-audio-connection-kit
 
 %description plugin-jack
 This package contains the PipeWire spa plugin to connect to a JACK server.
@@ -162,8 +186,6 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
 
 %build
 %meson -D docs=true -D man=true -D gstreamer=true -D systemd=true
@@ -174,6 +196,17 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 
 mkdir %{buildroot}%{_userunitdir}/sockets.target.wants
 ln -s ../pipewire.socket %{buildroot}%{_userunitdir}/sockets.target.wants/pipewire.socket
+
+ln -s pipewire-%{apiversion}/jack/libjack.so.0 %{buildroot}%{_libdir}/libjack.so.0.1.0
+ln -s libjack.so.0.1.0 %{buildroot}%{_libdir}/libjack.so.0
+ln -s pipewire-%{apiversion}/jack/libjackserver.so.0 %{buildroot}%{_libdir}/libjackserver.so.0.1.0
+ln -s libjackserver.so.0.1.0 %{buildroot}%{_libdir}/libjackserver.so.0
+ln -s pipewire-%{apiversion}/jack/libjacknet.so.0 %{buildroot}%{_libdir}/libjacknet.so.0.1.0
+ln -s libjacknet.so.0.1.0 %{buildroot}%{_libdir}/libjacknet.so.0
+
+ln -s pipewire-%{apiversion}/pulse/libpulse.so.0 %{buildroot}%{_libdir}/libpulse.so.0
+ln -s pipewire-%{apiversion}/pulse/libpulse-simple.so.0 %{buildroot}%{_libdir}/libpulse-simple.so.0
+ln -s pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.0 %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.0
 
 %check
 %meson_test
@@ -204,7 +237,7 @@ exit 0
 %license LICENSE COPYING
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
-%{_libdir}/pipewire-%{apiversion}/
+%{_libdir}/pipewire-%{apiversion}/libpipewire-*.so
 %dir %{_libdir}/spa-%{spaversion}
 %{_libdir}/spa-%{spaversion}/alsa/
 %{_libdir}/spa-%{spaversion}/audioconvert/
@@ -246,17 +279,35 @@ exit 0
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 
 %files libjack
-%{_libdir}/libjack-pw.so*
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
+%{_bindir}/pw-jack
+
+%files jack-audio-connection-kit
+%{_libdir}/libjack.so.*
+%{_libdir}/libjackserver.so.*
+%{_libdir}/libjacknet.so.*
 
 %files libpulse
-%{_libdir}/libpulse-pw.so*
-%{_libdir}/libpulse-simple-pw.so*
-%{_libdir}/libpulse-mainloop-glib-pw.so*
+%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so*
+%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so*
+%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so*
+%{_bindir}/pw-pulse
+
+%files pulseaudio
+%{_libdir}/libpulse.so.0
+%{_libdir}/libpulse-simple.so.0
+%{_libdir}/libpulse-mainloop-glib.so.0
 
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Thu Apr 30 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.4-1
+- Update to 0.3.4
+- Add 2 more packages that replace libjack and libpulse
+
 * Tue Mar 31 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.2-3
 - Add patch to unsubscribe unused sequencer ports
 - Change config to only disable bluez5 handling by default.
