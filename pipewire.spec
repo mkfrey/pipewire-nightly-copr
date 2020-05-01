@@ -12,10 +12,20 @@
 # where/how to apply multilib hacks
 %global multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
 
+# libpulse and libjack subpackages shouldn't have library provides
+# as the files they ship are not in the linker path. We also have
+# to exclude requires or else the subpackages wind up requiring the
+# libs they're no longer providing
+# FIXME: the jack-audio-connection-kit and pulseaudio subpackages
+# should get the auto-generated Provides: instead, but they do not,
+# either with or without the lines below, not sure how to fix that
+%global __provides_exclude_from ^%{_libdir}/pipewire-%{apiversion}/.*$
+%global __requires_exclude_from ^%{_libdir}/pipewire-%{apiversion}/.*$
+
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.4
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -304,6 +314,9 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Fri May 01 2020 Adam Williamson <awilliam@redhat.com> - 0.3.4-2
+- Suppress library provides from pipewire-lib{pulse,jack}
+
 * Thu Apr 30 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.4-1
 - Update to 0.3.4
 - Add 2 more packages that replace libjack and libpulse
