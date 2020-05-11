@@ -24,8 +24,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.4
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.3.5
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -218,6 +218,12 @@ ln -s pipewire-%{apiversion}/pulse/libpulse.so.0 %{buildroot}%{_libdir}/libpulse
 ln -s pipewire-%{apiversion}/pulse/libpulse-simple.so.0 %{buildroot}%{_libdir}/libpulse-simple.so.0
 ln -s pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.0 %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.0
 
+mkdir -p %{buildroot}%{_sysconfdir}/alsa/conf.d/
+cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
+        %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
+cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
+        %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+
 %check
 %meson_test
 
@@ -240,7 +246,7 @@ exit 0
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
-%{_sysconfdir}/pipewire/pipewire.conf
+%config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs
@@ -274,6 +280,10 @@ exit 0
 
 %files utils
 %{_bindir}/pw-mon
+%{_bindir}/pw-metadata
+%{_bindir}/pw-mididump
+%{_bindir}/pw-midiplay
+%{_bindir}/pw-midirecord
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
@@ -282,11 +292,21 @@ exit 0
 %{_bindir}/pw-record
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
+%{_mandir}/man1/pw-cat.1*
+%{_mandir}/man1/pw-dot.1*
+%{_mandir}/man1/pw-metadata.1*
+%{_mandir}/man1/pw-mididump.1*
+%{_mandir}/man1/pw-profiler.1*
+
 %{_bindir}/spa-monitor
 %{_bindir}/spa-inspect
 
 %files alsa
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
+%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf
+%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
+%config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
+%config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 
 %files libjack
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
@@ -314,6 +334,9 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Mon May 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.5-1
+- Update to 0.3.5
+
 * Fri May 01 2020 Adam Williamson <awilliam@redhat.com> - 0.3.4-2
 - Suppress library provides from pipewire-lib{pulse,jack}
 
