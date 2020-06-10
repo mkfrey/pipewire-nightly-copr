@@ -24,7 +24,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.5
+Version:        0.3.6
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -313,6 +313,7 @@ exit 0
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
 %{_bindir}/pw-jack
+%{_mandir}/man1/pw-jack.1*
 
 %files jack-audio-connection-kit
 %{_libdir}/libjack.so.*
@@ -324,6 +325,7 @@ exit 0
 %{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so*
 %{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so*
 %{_bindir}/pw-pulse
+%{_mandir}/man1/pw-pulse.1*
 
 %files pulseaudio
 %{_libdir}/libpulse.so.0
@@ -334,6 +336,9 @@ exit 0
 %{_libdir}/spa-%{spaversion}/jack/
 
 %changelog
+* Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-1
+- Update to 0.3.6
+
 * Mon May 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.5-1
 - Update to 0.3.5
 
