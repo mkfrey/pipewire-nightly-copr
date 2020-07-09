@@ -81,9 +81,6 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       systemd >= 184
 Requires:       rtkit
 
-# https://bugzilla.redhat.com/983606
-%global _hardened_build 1
-
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
 systems.
@@ -386,6 +383,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %changelog
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-2
 - Use systemd presets to enable pipewire.socket
+- Remove duplicate hardened_build flags
 
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-1
 - Update to 0.3.6
