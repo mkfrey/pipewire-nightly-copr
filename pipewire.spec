@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.6
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -51,7 +51,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 ## fedora patches
 Patch0:		0001-conf-disable-bluez5.patch
 
-BuildRequires:  meson >= 0.35.0
+BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libudev)
@@ -84,9 +84,6 @@ Requires:       rtkit
 # https://bugzilla.redhat.com/983606
 %global _hardened_build 1
 
-## enable systemd activation
-%global systemd 1
-
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
 systems.
@@ -104,6 +101,7 @@ to interface with a PipeWire media server.
 Summary:        GStreamer elements for PipeWire
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs{?_isa} = %{version}-%{release}
 
 %description gstreamer
 This package contains GStreamer elements to interface with a
@@ -227,9 +225,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %install
 %meson_install
 
-mkdir %{buildroot}%{_userunitdir}/sockets.target.wants
-ln -s ../pipewire.socket %{buildroot}%{_userunitdir}/sockets.target.wants/pipewire.socket
-
 %if 0%{?enable_jack}
 ln -s pipewire-%{apiversion}/jack/libjack.so.0 %{buildroot}%{_libdir}/libjack.so.0.1.0
 ln -s libjack.so.0.1.0 %{buildroot}%{_libdir}/libjack.so.0
@@ -270,15 +265,23 @@ getent passwd pipewire >/dev/null || \
     useradd -r -g pipewire -d %{_localstatedir}/run/pipewire -s /sbin/nologin -c "PipeWire System Daemon" pipewire
 exit 0
 
-%ldconfig_scriptlets libs
+%post
+%{?ldconfig}
+%systemd_user_post pipewire.service
+%systemd_user_post pipewire.socket
+
+%ldconfig_postun
+
+%triggerun -- %{name} < 0.3.6-2
+# This is for upgrades from previous versions which had a static symlink.
+# The %%post scriptlet above only does anything on initial package installation.
+# Remove before F33.
+systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %files
 %license LICENSE COPYING
 %doc README.md
-%if 0%{?systemd}
 %{_userunitdir}/pipewire.*
-%{_userunitdir}/sockets.target.wants/pipewire.socket
-%endif
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
@@ -381,6 +384,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-2
+- Use systemd presets to enable pipewire.socket
+
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-1
 - Update to 0.3.6
 - Add new man pages
