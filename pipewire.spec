@@ -98,7 +98,7 @@ to interface with a PipeWire media server.
 Summary:        GStreamer elements for PipeWire
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libs{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description gstreamer
 This package contains GStreamer elements to interface with a
@@ -386,6 +386,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 - Use systemd presets to enable pipewire.socket
 - Remove duplicate hardened_build flags
 - Add meson build again
+- Fix -gstreamer subpackage Requires:
 
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-1
 - Update to 0.3.6
