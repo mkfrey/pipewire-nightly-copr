@@ -218,6 +218,7 @@ This package provides a PulseAudio implementation based on PipeWire
     %{!?enable_pulse:-D pipewire-pulseaudio=false}			\
     %{!?enable_alsa:-D pipewire-alsa=false}				\
     %{!?enable_vulkan:-D vulkan=false}
+%meson_build
 
 %install
 %meson_install
@@ -384,6 +385,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-2
 - Use systemd presets to enable pipewire.socket
 - Remove duplicate hardened_build flags
+- Add meson build again
 
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-1
 - Update to 0.3.6
