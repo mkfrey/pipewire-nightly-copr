@@ -1,0 +1,29 @@
+From d4d80c16c1bf49ac4083466ce3e49ccfa8ff0599 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Tue, 21 Jul 2020 16:47:58 +0200
+Subject: [PATCH 1/3] jack: handle NULL keys
+
+---
+ pipewire-jack/src/pipewire-jack.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pipewire-jack/src/pipewire-jack.c b/pipewire-jack/src/pipewire-jack.c
+index fa800344..6cb59f40 100644
+--- a/pipewire-jack/src/pipewire-jack.c
++++ b/pipewire-jack/src/pipewire-jack.c
+@@ -1954,10 +1954,10 @@ static int metadata_property(void *object, uint32_t id,
+ 	uuid = jack_port_uuid_generate(id);
+ 	update_property(c, uuid, key, type, value);
+ 
+-	if (strcmp(key, "default.audio.sink.name") == 0) {
++	if (key && strcmp(key, "default.audio.sink.name") == 0) {
+ 		free(c->metadata->default_audio_sink);
+ 		c->metadata->default_audio_sink = value ? strdup(value) : NULL;
+-	} else if (strcmp(key, "default.audio.source.name") == 0) {
++	} else if (key && strcmp(key, "default.audio.source.name") == 0) {
+ 		free(c->metadata->default_audio_source);
+ 		c->metadata->default_audio_source = value ? strdup(value) : NULL;
+ 	}
+-- 
+2.26.2
+
