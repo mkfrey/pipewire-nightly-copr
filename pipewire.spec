@@ -32,8 +32,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.6
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.3.7
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -382,6 +382,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jul 21 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.7-1
+- Update to 0.3.7
+
 * Wed Jun 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.6-2
 - Use systemd presets to enable pipewire.socket
 - Remove duplicate hardened_build flags
