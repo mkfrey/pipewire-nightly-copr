@@ -32,8 +32,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.7
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.3.8
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -50,7 +50,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:		0001-conf-disable-bluez5.patch
-Patch1:		0001-jack-handle-NULL-keys.patch
 
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
@@ -211,7 +210,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
 
 %build
 %meson \
@@ -247,6 +245,11 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 %endif
+
+# upstream should use udev.pc
+mkdir -p %{buildroot}%{_prefix}/lib/udev/rules.d
+mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_prefix}/lib/udev/rules.d
+
 
 %check
 %ifarch s390x
@@ -294,6 +297,11 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
 %{_libdir}/pipewire-%{apiversion}/libpipewire-*.so
+%dir %{_datadir}/alsa-card-profile/
+%dir %{_datadir}/alsa-card-profile/mixer/
+%{_datadir}/alsa-card-profile/mixer/paths/
+%{_datadir}/alsa-card-profile/mixer/profile-sets/
+%{_prefix}/lib/udev/rules.d/90-pipewire-alsa.rules
 %dir %{_libdir}/spa-%{spaversion}
 %{_libdir}/spa-%{spaversion}/alsa/
 %{_libdir}/spa-%{spaversion}/audioconvert/
@@ -346,6 +354,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %if 0%{?enable_alsa}
 %files alsa
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
+%{_libdir}/alsa-lib/libasound_module_ctl_pipewire.so
 %{_datadir}/alsa/alsa.conf.d/50-pipewire.conf
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
@@ -384,6 +393,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jul 28 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.8-1
+- Update to 0.3.8
+
 * Tue Jul 21 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.7-2
 - Add patch to avoid crash when clearing metadata
 
