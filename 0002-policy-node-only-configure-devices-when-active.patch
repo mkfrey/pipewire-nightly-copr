@@ -1,0 +1,36 @@
+From 0d6bbaa7e1c72241b3b80cf3fb631a753b654592 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Wed, 29 Jul 2020 12:20:24 +0200
+Subject: [PATCH 2/2] policy-node: only configure devices when active
+
+Wait until a node is active before we attempt to configure it or
+else we don't yet have a format to configure it with.
+---
+ src/examples/media-session/policy-node.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/examples/media-session/policy-node.c b/src/examples/media-session/policy-node.c
+index a0357648..f4b8c3b8 100644
+--- a/src/examples/media-session/policy-node.c
++++ b/src/examples/media-session/policy-node.c
+@@ -516,13 +516,13 @@ static int rescan_node(struct impl *impl, struct node *n)
+ 	struct node *peer;
+ 	struct sm_object *obj;
+ 
+-	if (n->type == NODE_TYPE_DEVICE) {
+-		configure_node(n, NULL);
++	if (!n->active) {
++		pw_log_debug(NAME " %p: node %d is not active", impl, n->id);
+ 		return 0;
+ 	}
+ 
+-	if (!n->active) {
+-		pw_log_debug(NAME " %p: node %d is not active", impl, n->id);
++	if (n->type == NODE_TYPE_DEVICE) {
++		configure_node(n, NULL);
+ 		return 0;
+ 	}
+ 
+-- 
+2.26.2
+
