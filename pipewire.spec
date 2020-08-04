@@ -218,6 +218,10 @@ This package provides a PulseAudio implementation based on PipeWire
 %patch3 -p1 -b .0003
 
 %build
+%ifarch armv7hl
+# Fails due to asm issue
+%define _lto_cflags %{nil}
+%endif
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
@@ -402,6 +406,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 * Wed Jul 29 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.8-2
 - Add patch for fix chrome audio hicups
 - Add patch for infinite loop in device add/remove
+- Disable LTO on armv7
 
 * Tue Jul 28 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.8-1
 - Update to 0.3.8
