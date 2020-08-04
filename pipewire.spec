@@ -32,8 +32,8 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.8
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Version:        0.3.9
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -50,10 +50,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:         0001-conf-disable-bluez5.patch
-Patch1:         0001-pulse-take-queued-data-into-account-when-asking-for-.patch
-Patch2:         0001-acp-device-remove-sources-when-destroyed.patch
-Patch3:         0002-policy-node-only-configure-devices-when-active.patch
-Patch4:         0001-acp-fix-size-of-array.patch
 
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
@@ -214,10 +210,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
-%patch3 -p1 -b .0003
-%patch4 -p1 -b .0004
 
 %build
 %ifarch armv7hl
@@ -405,6 +397,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Aug 04 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.9-1
+- Update to 0.3.9
+
 * Tue Aug 04 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.8-3
 - Add patch to avoid segfault when iterating ports.
 - Fixes #1865827
