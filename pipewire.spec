@@ -32,7 +32,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.10
+Version:        0.3.11
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -397,6 +397,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Sep 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.11-1
+- Update to 0.3.11
+
 * Mon Aug 17 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.10-1
 - Update to 0.3.10
 
