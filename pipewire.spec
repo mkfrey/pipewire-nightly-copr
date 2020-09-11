@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.11
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -45,6 +45,9 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
+Patch1:         0001-stream-unmark-Not-Implemented-methods.patch
+Patch2:         0002-pulse-improve-handling-of-buffer-attributes.patch
+Patch3:         0003-pulse-always-notify-of-available-data.patch
 
 ## upstreamable patches
 
@@ -210,6 +213,9 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
+%patch1 -p1 -b .0001
+%patch2 -p1 -b .0002
+%patch3 -p1 -b .0003
 
 %build
 %ifarch armv7hl
@@ -397,6 +403,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Sep 11 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.11-2
+- Add some patches to improve pulse compatibility
+
 * Thu Sep 10 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.11-1
 - Update to 0.3.11
 

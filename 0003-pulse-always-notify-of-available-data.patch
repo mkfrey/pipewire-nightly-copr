@@ -1,0 +1,54 @@
+From 38f8c9c6c8a1d244994f11251a73b455af6cf8af Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Fri, 11 Sep 2020 15:34:30 +0200
+Subject: [PATCH 3/3] pulse: always notify of available data
+
+If we have some data available for capture, always report this
+to get the lowest latency possible.
+---
+ pipewire-pulseaudio/src/stream.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/pipewire-pulseaudio/src/stream.c b/pipewire-pulseaudio/src/stream.c
+index 0f39ae80..b0956ddc 100644
+--- a/pipewire-pulseaudio/src/stream.c
++++ b/pipewire-pulseaudio/src/stream.c
+@@ -450,13 +450,9 @@ static void stream_process(void *data)
+ 			s->write_callback(s, writable, s->write_userdata);
+ 	}
+ 	else {
+-		uint64_t required;
+-
+ 		pull_input(s);
+ 
+-		required = SPA_MIN(s->maxblock, s->buffer_attr.fragsize);
+-
+-		if (s->read_callback && s->ready_bytes > required && s->state == PA_STREAM_READY)
++		if (s->read_callback && s->ready_bytes > 0 && s->state == PA_STREAM_READY)
+ 			s->read_callback(s, s->ready_bytes, s->read_userdata);
+ 	}
+ }
+@@ -1272,7 +1268,7 @@ size_t pa_stream_writable_size(PA_CONST pa_stream *s)
+ SPA_EXPORT
+ size_t pa_stream_readable_size(PA_CONST pa_stream *s)
+ {
+-	uint64_t readable, required;
++	uint64_t readable;
+ 
+ 	spa_assert(s);
+ 	spa_assert(s->refcount >= 1);
+@@ -1283,10 +1279,7 @@ size_t pa_stream_readable_size(PA_CONST pa_stream *s)
+ 			PA_ERR_BADSTATE, (size_t) -1);
+ 
+ 	readable = s->ready_bytes;
+-	required = SPA_MIN(s->maxblock, s->buffer_attr.fragsize);
+-	pw_log_trace("stream %p: %zd %zd", s, readable, required);
+-	if (readable < required)
+-		readable = 0;
++	pw_log_trace("stream %p: readable:%"PRIu64" fragsize:%u", s, readable, s->buffer_attr.fragsize);
+ 
+ 	return readable;
+ }
+-- 
+2.26.2
+
