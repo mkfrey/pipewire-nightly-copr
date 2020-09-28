@@ -32,7 +32,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.12
+Version:        0.3.13
 Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
@@ -344,6 +344,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
+%{_bindir}/pw-reserve
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
@@ -352,8 +353,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_mandir}/man1/pw-mididump.1*
 %{_mandir}/man1/pw-profiler.1*
 
-%{_bindir}/spa-monitor
+%{_bindir}/spa-acp-tool
 %{_bindir}/spa-inspect
+%{_bindir}/spa-monitor
+%{_bindir}/spa-resample
 
 %if 0%{?enable_alsa}
 %files alsa
@@ -397,6 +400,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Sep 28 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-1
+- Update to 0.3.13
+
 * Fri Sep 18 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.12-1
 - Update to 0.3.12
 
