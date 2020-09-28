@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.13
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -212,10 +212,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %patch0 -p1 -b .0000
 
 %build
-%ifarch armv7hl
-# Fails due to asm issue
-%define _lto_cflags %{nil}
-%endif
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
@@ -400,6 +396,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Sep 28 2020 Jeff Law <law@redhat.com> - 0.3.13-2
+- Re-enable LTO as upstream GCC target/96939 has been fixed
+
 * Mon Sep 28 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-1
 - Update to 0.3.13
 
