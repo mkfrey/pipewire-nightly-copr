@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.13
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -45,6 +45,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
+Patch1:         0001-pulse-limit-get_writable_size.patch
 
 ## upstreamable patches
 
@@ -210,6 +211,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
+%patch1 -p1 -b .0001
 
 %build
 %meson \
@@ -396,6 +398,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Sep 29 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-3
+- Add patch to improve pulse compatibility
+
 * Mon Sep 28 2020 Jeff Law <law@redhat.com> - 0.3.13-2
 - Re-enable LTO as upstream GCC target/96939 has been fixed
 
