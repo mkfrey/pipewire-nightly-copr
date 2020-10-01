@@ -1,0 +1,25 @@
+From 735eefa2fb17219cd2067f084c16f08d42d84aa6 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 1 Oct 2020 11:31:52 +0200
+Subject: [PATCH] acp: pass right user_data to event
+
+---
+ spa/plugins/alsa/acp/acp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spa/plugins/alsa/acp/acp.c b/spa/plugins/alsa/acp/acp.c
+index 6106bbba..35a6dfc9 100644
+--- a/spa/plugins/alsa/acp/acp.c
++++ b/spa/plugins/alsa/acp/acp.c
+@@ -568,7 +568,7 @@ static int hdmi_eld_changed(snd_mixer_elem_t *melem, unsigned int mask)
+ 	pa_proplist_as_dict(p->proplist, &p->port.props);
+ 
+ 	if (changed && mask != 0 && impl->events && impl->events->props_changed)
+-		impl->events->props_changed(impl);
++		impl->events->props_changed(impl->user_data);
+ 	return 0;
+ }
+ 
+-- 
+2.26.2
+

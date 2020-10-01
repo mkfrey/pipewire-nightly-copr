@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.13
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -46,6 +46,9 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## upstream patches
 Patch1:         0001-pulse-limit-get_writable_size.patch
+Patch2:         0001-alsa-monitor-avoid-crash-in-release.patch
+Patch3:         0001-acp-pass-right-user_data-to-event.patch
+Patch4:         0001-media-session-make-sure-we-don-t-read-invalid-data.patch
 
 ## upstreamable patches
 
@@ -212,6 +215,9 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %patch0 -p1 -b .0000
 %patch1 -p1 -b .0001
+%patch2 -p1 -b .0002
+%patch3 -p1 -b .0003
+%patch4 -p1 -b .0004
 
 %build
 %meson \
@@ -398,6 +404,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Oct 1 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-4
+- Add patches for some crasher bugs
+- Fixes rhbz#1884177
+
 * Tue Sep 29 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-3
 - Add patch to improve pulse compatibility
 
