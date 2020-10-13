@@ -33,7 +33,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        0.3.13
-Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        5%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -49,6 +49,7 @@ Patch1:         0001-pulse-limit-get_writable_size.patch
 Patch2:         0001-alsa-monitor-avoid-crash-in-release.patch
 Patch3:         0001-acp-pass-right-user_data-to-event.patch
 Patch4:         0001-media-session-make-sure-we-don-t-read-invalid-data.patch
+Patch5:         0001-gst-add-option-to-disable-device-provider.patch
 
 ## upstreamable patches
 
@@ -218,10 +219,12 @@ This package provides a PulseAudio implementation based on PipeWire
 %patch2 -p1 -b .0002
 %patch3 -p1 -b .0003
 %patch4 -p1 -b .0004
+%patch5 -p1 -b .0005
 
 %build
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
+    -D gstreamer-device-provider=false					\
     %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
     %{!?enable_pulse:-D pipewire-pulseaudio=false}			\
     %{!?enable_alsa:-D pipewire-alsa=false}				\
@@ -404,6 +407,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Oct 13 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-5
+- Disable device provider for now
+- Fixes rhbz#1884260
+
 * Thu Oct 1 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.13-4
 - Add patches for some crasher bugs
 - Fixes rhbz#1884177

@@ -1,0 +1,96 @@
+From ea14ff1998ccc59946d9bede5b60081409a3b74f Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Tue, 13 Oct 2020 12:40:48 +0200
+Subject: [PATCH] gst: add option to disable device provider
+
+---
+ config.h.meson        | 2 ++
+ meson.build           | 6 ++++++
+ meson_options.txt     | 4 ++++
+ src/gst/gstpipewire.c | 2 ++
+ src/gst/meson.build   | 5 ++++-
+ 5 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/config.h.meson b/config.h.meson
+index a8acb340..ae2c2d0d 100644
+--- a/config.h.meson
++++ b/config.h.meson
+@@ -468,3 +468,5 @@
+ 
+ #mesondefine PA_ALSA_PATHS_DIR
+ #mesondefine PA_ALSA_PROFILE_SETS_DIR
++
++#mesondefine HAVE_GSTREAMER_DEVICE_PROVIDER
+diff --git a/meson.build b/meson.build
+index 06b46343..f8dcfcb0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -296,6 +296,12 @@ if get_option('bluez5')
+   endif
+ endif
+ 
++if get_option('gstreamer')
++  if get_option('gstreamer-device-provider')
++    cdata.set('HAVE_GSTREAMER_DEVICE_PROVIDER', 1)
++  endif
++endif
++
+ configure_file(input : 'config.h.meson',
+   output : 'config.h',
+   configuration : cdata)
+diff --git a/meson_options.txt b/meson_options.txt
+index 6a8bb071..72f6e721 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -22,6 +22,10 @@ option('gstreamer',
+        description: 'Build GStreamer plugins',
+        type: 'boolean',
+        value: true)
++option('gstreamer-device-provider',
++       description: 'Build GStreamer device provider plugin',
++       type: 'boolean',
++       value: true)
+ option('systemd',
+        description: 'Enable systemd integration',
+        type: 'boolean',
+diff --git a/src/gst/gstpipewire.c b/src/gst/gstpipewire.c
+index 786ad195..9f752fe2 100644
+--- a/src/gst/gstpipewire.c
++++ b/src/gst/gstpipewire.c
+@@ -53,9 +53,11 @@ plugin_init (GstPlugin *plugin)
+   gst_element_register (plugin, "pipewiresink", GST_RANK_NONE,
+       GST_TYPE_PIPEWIRE_SINK);
+ 
++#if HAVE_GSTREAMER_DEVICE_PROVIDER
+   if (!gst_device_provider_register (plugin, "pipewiredeviceprovider",
+        GST_RANK_PRIMARY + 1, GST_TYPE_PIPEWIRE_DEVICE_PROVIDER))
+     return FALSE;
++#endif
+ 
+   GST_DEBUG_CATEGORY_INIT (pipewire_debug, "pipewire", 0, "PipeWire elements");
+ 
+diff --git a/src/gst/meson.build b/src/gst/meson.build
+index e6c097f1..66ea5261 100644
+--- a/src/gst/meson.build
++++ b/src/gst/meson.build
+@@ -2,13 +2,16 @@ pipewire_gst_sources = [
+   'gstpipewire.c',
+   'gstpipewirecore.c',
+   'gstpipewireclock.c',
+-  'gstpipewiredeviceprovider.c',
+   'gstpipewireformat.c',
+   'gstpipewirepool.c',
+   'gstpipewiresink.c',
+   'gstpipewiresrc.c',
+ ]
+ 
++if get_option('gstreamer-device-provider')
++  pipewire_gst_sources += [ 'gstpipewiredeviceprovider.c' ]
++endif
++
+ pipewire_gst_headers = [
+   'gstpipewireclock.h',
+   'gstpipewirecore.h',
+-- 
+2.26.2
+
