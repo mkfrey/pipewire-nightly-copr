@@ -201,7 +201,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %endif
 
 %prep
-%setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
+%setup -q -T -b0 -n %{name}-master
 
 %patch0 -p1 -b .0000
 %patch1 -p1 -b .0001
