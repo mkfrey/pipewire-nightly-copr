@@ -33,13 +33,6 @@ License:        MIT
 URL:            https://pipewire.org/
 Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipewire-master.tar.gz
 
-## upstream patches
-Patch1:         0001-pulse-limit-get_writable_size.patch
-Patch2:         0001-alsa-monitor-avoid-crash-in-release.patch
-Patch3:         0001-acp-pass-right-user_data-to-event.patch
-Patch4:         0001-media-session-make-sure-we-don-t-read-invalid-data.patch
-Patch5:         0001-gst-add-option-to-disable-device-provider.patch
-
 ## upstreamable patches
 
 ## fedora patches
@@ -204,11 +197,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-master
 
 %patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
-%patch3 -p1 -b .0003
-%patch4 -p1 -b .0004
-%patch5 -p1 -b .0005
 
 %build
 %meson \
