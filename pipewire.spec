@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 13
+%global microversion 14
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        6%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,11 +41,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch1:         0001-pulse-limit-get_writable_size.patch
-Patch2:         0001-alsa-monitor-avoid-crash-in-release.patch
-Patch3:         0001-acp-pass-right-user_data-to-event.patch
-Patch4:         0001-media-session-make-sure-we-don-t-read-invalid-data.patch
-Patch5:         0001-gst-add-option-to-disable-device-provider.patch
 
 ## upstreamable patches
 
@@ -224,11 +219,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
-%patch3 -p1 -b .0003
-%patch4 -p1 -b .0004
-%patch5 -p1 -b .0005
 
 %build
 %meson \
@@ -425,6 +415,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Oct 30 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.14-1
+- Update to 0.3.14
+
 * Sun Oct 18 2020 Neal Gompa <ngompa13@gmail.com> - 0.3.13-6
 - Fix jack and pulseaudio subpackages to generate dependencies properly
 
