@@ -27,7 +27,7 @@
 
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.13+nightly
+Version:        0.3.14+nightly
 Release:        %(date +%%y%%m%%d)%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
