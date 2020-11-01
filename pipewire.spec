@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,6 +41,10 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
+Patch1:         0001-pulse-server-don-t-underrun-when-draining.patch
+Patch2:         0002-pulse-server-use-name-if-description-not-set.patch
+Patch3:         0003-pulse-server-don-t-ever-block.patch
+
 
 ## upstreamable patches
 
@@ -219,6 +223,9 @@ This package provides a PulseAudio implementation based on PipeWire
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
 %patch0 -p1 -b .0000
+%patch1 -p1 -b .0001
+%patch2 -p1 -b .0002
+%patch3 -p1 -b .0003
 
 %build
 %meson \
@@ -415,6 +422,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Sun Nov 1 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.14-2
+- Add some pulse server patches
+
 * Fri Oct 30 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.14-1
 - Update to 0.3.14
 
