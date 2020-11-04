@@ -1,5 +1,11 @@
+%global majorversion 0
+%global minorversion 3
+%global microversion 15
+
 %global apiversion   0.3
 %global spaversion   0.2
+%global soversion    0
+%global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # https://bugzilla.redhat.com/983606
 %global _hardened_build 1
@@ -15,23 +21,15 @@
 %global enable_vulkan 1
 %endif
 
-# libpulse and libjack subpackages shouldn't have library provides
-# as the files they ship are not in the linker path. We also have
-# to exclude requires or else the subpackages wind up requiring the
-# libs they're no longer providing
-# FIXME: the jack-audio-connection-kit and pulseaudio subpackages
-# should get the auto-generated Provides: instead, but they do not,
-# either with or without the lines below, not sure how to fix that
-%global __provides_exclude_from ^%{_libdir}/pipewire-%{apiversion}/.*$
-%global __requires_exclude_from ^%{_libdir}/pipewire-%{apiversion}/.*$
-
 Name:           pipewire
 Summary:        Media Sharing Server
-Version:        0.3.15+nightly
+Version:        %{majorversion}.%{minorversion}.%{microversion}+nightly
 Release:        %(date +%%y%%m%%d)%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipewire-master.tar.gz
+
+## upstream patches
 
 ## upstreamable patches
 
@@ -132,8 +130,14 @@ License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
+Conflicts:      jack-audio-connection-kit
+Conflicts:      jack-audio-connection-kit-dbus
 # Renamed in F32
 Obsoletes:      pipewire-jack < 0.2.96-2
+# Fixed jack subpackages
+Conflicts:      %{name}-libjack < 0.3.13-6
+Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
+Obsoletes:      %{name}-jack-audio-connection-kit < 0.3.13-6
 
 %description libjack
 This package contains a PipeWire replacement for JACK audio connection kit
@@ -147,7 +151,9 @@ Requires:       %{name}-libjack%{?_isa} = %{version}-%{release}
 BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
 Conflicts:      jack-audio-connection-kit
 Conflicts:      jack-audio-connection-kit-dbus
-Provides:       jack-audio-connection-kit
+# Fixed jack subpackages
+Conflicts:      %{name}-libjack < 0.3.13-6
+Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
 
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
@@ -171,8 +177,14 @@ License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  pulseaudio-libs-devel
+Conflicts:      pulseaudio-libs
+Conflicts:      pulseaudio-libs-glib2
 # Renamed in F32
 Obsoletes:      pipewire-pulseaudio < 0.2.96-2
+# Fixed pulseaudio subpackages
+Conflicts:      %{name}-libpulse < 0.3.13-6
+Conflicts:      %{name}-pulseaudio < 0.3.13-6
+Obsoletes:      %{name}-pulseaudio < 0.3.13-6
 
 %description libpulse
 This package contains a PipeWire replacement for PulseAudio "libpulse" library.
@@ -183,10 +195,9 @@ License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libpulse%{?_isa} = %{version}-%{release}
 BuildRequires:  pulseaudio-libs-devel
-Conflicts:      pulseaudio-libs
-Conflicts:      pulseaudio-libs-glib2
-Provides:       pulseaudio-libs
-Provides:       pulseaudio-libs-glib2
+# Fixed pulseaudio subpackages
+Conflicts:      %{name}-libpulse < 0.3.13-6
+Conflicts:      %{name}-pulseaudio < 0.3.13-6
 
 %description pulseaudio
 This package provides a PulseAudio implementation based on PipeWire
@@ -209,18 +220,30 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson_install
 
 %if 0%{?enable_jack}
-ln -s pipewire-%{apiversion}/jack/libjack.so.0 %{buildroot}%{_libdir}/libjack.so.0.1.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libjack.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.%{libversion}
+ln -s libjack.so.%{libversion} %{buildroot}%{_libdir}/libjack.so.0.1.0
 ln -s libjack.so.0.1.0 %{buildroot}%{_libdir}/libjack.so.0
-ln -s pipewire-%{apiversion}/jack/libjackserver.so.0 %{buildroot}%{_libdir}/libjackserver.so.0.1.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libjackserver.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.%{libversion}
+ln -s libjackserver.so.%{libversion} %{buildroot}%{_libdir}/libjackserver.so.0.1.0
 ln -s libjackserver.so.0.1.0 %{buildroot}%{_libdir}/libjackserver.so.0
-ln -s pipewire-%{apiversion}/jack/libjacknet.so.0 %{buildroot}%{_libdir}/libjacknet.so.0.1.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libjacknet.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.%{libversion}
+ln -s libjacknet.so.%{libversion} %{buildroot}%{_libdir}/libjacknet.so.0.1.0
 ln -s libjacknet.so.0.1.0 %{buildroot}%{_libdir}/libjacknet.so.0
 %endif
 
 %if 0%{?enable_pulse}
-ln -s pipewire-%{apiversion}/pulse/libpulse.so.0 %{buildroot}%{_libdir}/libpulse.so.0
-ln -s pipewire-%{apiversion}/pulse/libpulse-simple.so.0 %{buildroot}%{_libdir}/libpulse-simple.so.0
-ln -s pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.0 %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libpulse.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so.%{libversion}
+ln -s libpulse.so.%{libversion} %{buildroot}%{_libdir}/libpulse.so.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so.%{libversion}
+ln -s libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}/libpulse-simple.so.0
+mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}
+ln -sr %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.%{libversion}
+ln -s libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.0
 %endif
 
 %if 0%{?enable_alsa}
@@ -254,11 +277,8 @@ getent passwd pipewire >/dev/null || \
 exit 0
 
 %post
-%{?ldconfig}
 %systemd_user_post pipewire.service
 %systemd_user_post pipewire.socket
-
-%ldconfig_postun
 
 %triggerun -- %{name} < 0.3.6-2
 # This is for upgrades from previous versions which had a static symlink.
@@ -350,14 +370,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %if 0%{?enable_jack}
-%files libjack
+%files jack-audio-connection-kit
+%{_bindir}/pw-jack
+%{_mandir}/man1/pw-jack.1*
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
-%{_bindir}/pw-jack
-%{_mandir}/man1/pw-jack.1*
 
-%files jack-audio-connection-kit
+%files libjack
 %{_libdir}/libjack.so.*
 %{_libdir}/libjackserver.so.*
 %{_libdir}/libjacknet.so.*
@@ -367,15 +387,15 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %if 0%{?enable_pulse}
-%files libpulse
+%files pulseaudio
+%{_bindir}/pw-pulse
+%{_mandir}/man1/pw-pulse.1*
 %{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so*
 %{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so*
 %{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so*
-%{_bindir}/pw-pulse
-%{_mandir}/man1/pw-pulse.1*
 
-%files pulseaudio
-%{_libdir}/libpulse.so.0
-%{_libdir}/libpulse-simple.so.0
-%{_libdir}/libpulse-mainloop-glib.so.0
+%files libpulse
+%{_libdir}/libpulse.so.*
+%{_libdir}/libpulse-simple.so.*
+%{_libdir}/libpulse-mainloop-glib.so.*
 %endif
