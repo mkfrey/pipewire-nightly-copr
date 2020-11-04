@@ -36,7 +36,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipew
 ## upstreamable patches
 
 ## fedora patches
-Patch0:         0001-conf-disable-bluez5.patch
 
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
@@ -195,8 +194,6 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %prep
 %setup -q -T -b0 -n %{name}-master
-
-%patch0 -p1 -b .0000
 
 %build
 %meson \
