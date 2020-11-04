@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 14
+%global microversion 15
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,15 +41,10 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch1:         0001-pulse-server-don-t-underrun-when-draining.patch
-Patch2:         0002-pulse-server-use-name-if-description-not-set.patch
-Patch3:         0003-pulse-server-don-t-ever-block.patch
-
 
 ## upstreamable patches
 
 ## fedora patches
-Patch0:         0001-conf-disable-bluez5.patch
 
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
@@ -221,11 +216,6 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
-
-%patch0 -p1 -b .0000
-%patch1 -p1 -b .0001
-%patch2 -p1 -b .0002
-%patch3 -p1 -b .0003
 
 %build
 %meson \
@@ -422,6 +412,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Nov 4 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.15-1
+- Update to 0.3.15
+
 * Sun Nov 1 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.14-2
 - Add some pulse server patches
 
