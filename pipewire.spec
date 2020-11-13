@@ -211,7 +211,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
     %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?enable_pulse:-D pipewire-pulseaudio=false}			\
+    %{?enable_pulse:-D pipewire-pulseaudio=true}			\
     %{!?enable_alsa:-D pipewire-alsa=false}				\
     %{!?enable_vulkan:-D vulkan=false}
 %meson_build
