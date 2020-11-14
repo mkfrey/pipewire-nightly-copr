@@ -279,6 +279,8 @@ exit 0
 %post
 %systemd_user_post pipewire.service
 %systemd_user_post pipewire.socket
+%systemd_user_post pipewire-pulse.service
+%systemd_user_post pipewire-pulse.socket
 
 %triggerun -- %{name} < 0.3.6-2
 # This is for upgrades from previous versions which had a static symlink.
@@ -290,8 +292,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %license LICENSE COPYING
 %doc README.md
 %{_userunitdir}/pipewire.*
+%{_userunitdir}/pipewire-pulse.*
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
+%{_bindir}/pipewire-pulse
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
