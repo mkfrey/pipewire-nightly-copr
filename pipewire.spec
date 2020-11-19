@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 15
+%global microversion 16
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,7 +41,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch0:         0001-protocol-native-do-version-check-on-HELLO.patch
 
 ## upstreamable patches
 
@@ -85,6 +84,7 @@ systems.
 Summary:        Libraries for PipeWire clients
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      %{name}-libpulse < %{version}-%{release}
 
 %description libs
 This package contains the runtime libraries for any application that wishes
@@ -183,30 +183,13 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 %endif
 
 %if 0%{?enable_pulse}
-%package libpulse
-Summary:        PipeWire libpulse library
-License:        MIT
-Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-BuildRequires:  pulseaudio-libs-devel
-Conflicts:      pulseaudio-libs
-Conflicts:      pulseaudio-libs-glib2
-# Renamed in F32
-Obsoletes:      pipewire-pulseaudio < 0.2.96-2
-# Fixed pulseaudio subpackages
-Conflicts:      %{name}-libpulse < 0.3.13-6
-Conflicts:      %{name}-pulseaudio < 0.3.13-6
-Obsoletes:      %{name}-pulseaudio < 0.3.13-6
-
-%description libpulse
-This package contains a PipeWire replacement for PulseAudio "libpulse" library.
-
 %package pulseaudio
 Summary:        PipeWire PulseAudio implementation
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libpulse%{?_isa} = %{version}-%{release}
-BuildRequires:  pulseaudio-libs-devel
+Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+BuildRequires:  pulseaudio-libs
+Conflicts:      pulseaudio
 # Fixed pulseaudio subpackages
 Conflicts:      %{name}-libpulse < 0.3.13-6
 Conflicts:      %{name}-pulseaudio < 0.3.13-6
@@ -217,8 +200,6 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
-
-%patch0 -p1 -b .0000
 
 %build
 %meson \
@@ -234,30 +215,8 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson_install
 
 %if 0%{?enable_jack}
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libjack.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.%{libversion}
-ln -s libjack.so.%{libversion} %{buildroot}%{_libdir}/libjack.so.0.1.0
-ln -s libjack.so.0.1.0 %{buildroot}%{_libdir}/libjack.so.0
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libjackserver.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.%{libversion}
-ln -s libjackserver.so.%{libversion} %{buildroot}%{_libdir}/libjackserver.so.0.1.0
-ln -s libjackserver.so.0.1.0 %{buildroot}%{_libdir}/libjackserver.so.0
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libjacknet.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.%{libversion}
-ln -s libjacknet.so.%{libversion} %{buildroot}%{_libdir}/libjacknet.so.0.1.0
-ln -s libjacknet.so.0.1.0 %{buildroot}%{_libdir}/libjacknet.so.0
-%endif
-
-%if 0%{?enable_pulse}
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libpulse.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so.%{libversion}
-ln -s libpulse.so.%{libversion} %{buildroot}%{_libdir}/libpulse.so.0
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so.%{libversion}
-ln -s libpulse-simple.so.%{libversion} %{buildroot}%{_libdir}/libpulse-simple.so.0
-mv %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}
-ln -sr %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so.%{libversion}
-ln -s libpulse-mainloop-glib.so.%{libversion} %{buildroot}%{_libdir}/libpulse-mainloop-glib.so.0
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
+echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %endif
 
 %if 0%{?enable_alsa}
@@ -299,6 +258,15 @@ exit 0
 # The %%post scriptlet above only does anything on initial package installation.
 # Remove before F33.
 systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
+
+%if 0%{?enable_pulse}
+%post pulseaudio
+%{?ldconfig}
+%systemd_user_post pipewire-pulse.service
+%systemd_user_post pipewire-pulse.socket
+
+%ldconfig_postun
+%endif
 
 %files
 %license LICENSE COPYING
@@ -392,9 +360,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
 
 %files libjack
-%{_libdir}/libjack.so.*
-%{_libdir}/libjackserver.so.*
-%{_libdir}/libjacknet.so.*
+%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
@@ -402,19 +368,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %if 0%{?enable_pulse}
 %files pulseaudio
-%{_bindir}/pw-pulse
-%{_mandir}/man1/pw-pulse.1*
-%{_libdir}/pipewire-%{apiversion}/pulse/libpulse.so*
-%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-simple.so*
-%{_libdir}/pipewire-%{apiversion}/pulse/libpulse-mainloop-glib.so*
-
-%files libpulse
-%{_libdir}/libpulse.so.*
-%{_libdir}/libpulse-simple.so.*
-%{_libdir}/libpulse-mainloop-glib.so.*
+%{_bindir}/pipewire-pulse
+%{_userunitdir}/pipewire-pulse.*
 %endif
 
 %changelog
+* Thu Nov 19 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-1
+- Update to 0.3.16
+
 * Wed Nov 4 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.15-2
 - Add patch to fix screen sharing for old clients
 
