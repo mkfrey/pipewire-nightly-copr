@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,6 +41,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
+Patch0:         0001-hook-zero-hooks-before-adding-them.patch
 
 ## upstreamable patches
 
@@ -200,6 +201,8 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
+
+%patch0 -p1 -b .0000
 
 %build
 %meson \
@@ -373,6 +376,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Nov 20 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-2
+- Add patch to fix crash in kwin, Fixes rhbz#1899826
+
 * Thu Nov 19 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-1
 - Update to 0.3.16
 

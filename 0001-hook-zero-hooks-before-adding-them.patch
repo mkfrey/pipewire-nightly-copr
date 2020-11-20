@@ -1,0 +1,108 @@
+From fc2b0b20ad4271b0c6f258451a82311b792b7a57 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Fri, 20 Nov 2020 09:40:24 +0100
+Subject: [PATCH] hook: zero hooks before adding them
+
+Clear the hook before adding it so that we are sure the removed
+callback doesn't contain garbage and cause a crash on disconnect.
+
+Mark the removed and priv fields as private. Make sure to add the
+removed callback after adding the hook.
+
+Fixes a crash in kwin
+---
+ spa/include/spa/utils/hook.h | 7 +++++--
+ spa/tests/test-utils.c       | 8 ++++----
+ src/tests/test-endpoint.c    | 1 -
+ 3 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/spa/include/spa/utils/hook.h b/spa/include/spa/utils/hook.h
+index ef063c86..f1ca66dc 100644
+--- a/spa/include/spa/utils/hook.h
++++ b/spa/include/spa/utils/hook.h
+@@ -70,7 +70,8 @@ struct spa_interface {
+ struct spa_hook {
+ 	struct spa_list link;
+ 	struct spa_callbacks cb;
+-	/** callback and data for the hook list */
++	/** callback and data for the hook list, private to the
++	  * hook_list implementor */
+ 	void (*removed) (struct spa_hook *hook);
+ 	void *priv;
+ };
+@@ -86,11 +87,12 @@ static inline bool spa_hook_list_is_empty(struct spa_hook_list *list)
+ 	return spa_list_is_empty(&list->list);
+ }
+ 
+-/** Append a hook \memberof spa_hook */
++/** Append a hook \memberof spa_hook. */
+ static inline void spa_hook_list_append(struct spa_hook_list *list,
+ 					struct spa_hook *hook,
+ 					const void *funcs, void *data)
+ {
++	spa_zero(*hook);
+ 	hook->cb = SPA_CALLBACKS_INIT(funcs, data);
+ 	spa_list_append(&list->list, &hook->link);
+ }
+@@ -100,6 +102,7 @@ static inline void spa_hook_list_prepend(struct spa_hook_list *list,
+ 					 struct spa_hook *hook,
+ 					 const void *funcs, void *data)
+ {
++	spa_zero(*hook);
+ 	hook->cb = SPA_CALLBACKS_INIT(funcs, data);
+ 	spa_list_prepend(&list->list, &hook->link);
+ }
+diff --git a/spa/tests/test-utils.c b/spa/tests/test-utils.c
+index 26ed6c81..ac57399a 100644
+--- a/spa/tests/test-utils.c
++++ b/spa/tests/test-utils.c
+@@ -291,12 +291,12 @@ static void test_hook(void)
+     spa_hook_list_init(&hl);
+ 
+     h = malloc(sizeof(struct spa_hook));
+-    h->removed = hook_removed_cb;
+     spa_hook_list_append(&hl, h, &callbacks[1], &data);
++    h->removed = hook_removed_cb;
+ 
+     h = malloc(sizeof(struct spa_hook));
+-    h->removed = hook_removed_cb;
+     spa_hook_list_append(&hl, h, &callbacks[2], &data);
++    h->removed = hook_removed_cb;
+ 
+     /* iterate with the simple API */
+     spa_hook_list_call_simple(&hl, struct my_hook, invoke, VERSION);
+@@ -308,8 +308,8 @@ static void test_hook(void)
+     memset(&data, 0, sizeof(struct my_hook_data));
+ 
+     h = malloc(sizeof(struct spa_hook));
+-    h->removed = hook_removed_cb;
+     spa_hook_list_prepend(&hl, h, &callbacks[0], &data);
++    h->removed = hook_removed_cb;
+ 
+     /* call only the first hook - this should be callback_1 */
+     count = spa_hook_list_call_once(&hl, struct my_hook, invoke, VERSION);
+@@ -323,8 +323,8 @@ static void test_hook(void)
+ 
+     /* add callback_4 - this is version 1, so it shouldn't be executed */
+     h = malloc(sizeof(struct spa_hook));
+-    h->removed = hook_removed_cb;
+     spa_hook_list_append(&hl, h, &callbacks[3], &data);
++    h->removed = hook_removed_cb;
+ 
+     count = spa_hook_list_call(&hl, struct my_hook, invoke, VERSION);
+     spa_assert(count == 3);
+diff --git a/src/tests/test-endpoint.c b/src/tests/test-endpoint.c
+index 60b2cc46..94994c54 100644
+--- a/src/tests/test-endpoint.c
++++ b/src/tests/test-endpoint.c
+@@ -383,7 +383,6 @@ static void test_endpoint(void)
+ 	uint8_t buffer[1024];
+ 	struct spa_pod_builder b = SPA_POD_BUILDER_INIT(buffer, 1024);
+ 
+-	spa_zero(d);
+ 	d.loop = pw_main_loop_new(NULL);
+ 	d.context = pw_context_new(pw_main_loop_get_loop(d.loop), NULL, 0);
+ 	spa_assert(d.context != NULL);
+-- 
+2.26.2
+
