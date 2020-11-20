@@ -176,7 +176,7 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 Summary:        PipeWire PulseAudio implementation
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  pulseaudio-libs
 Conflicts:      pulseaudio
 # Fixed pulseaudio subpackages
