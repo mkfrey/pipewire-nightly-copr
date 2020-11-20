@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -188,7 +188,7 @@ This package contains the PipeWire spa plugin to connect to a JACK server.
 Summary:        PipeWire PulseAudio implementation
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-lib%{?_isa} = %{version}-%{release}
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires:  pulseaudio-libs
 Conflicts:      pulseaudio
 # Fixed pulseaudio subpackages
@@ -376,6 +376,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Nov 20 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-3
+- Fix Requires for pipewire-pulseaudio
+- Fixes rhbz#1899945
+
 * Fri Nov 20 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-2
 - Add patch to fix crash in kwin, Fixes rhbz#1899826
 
