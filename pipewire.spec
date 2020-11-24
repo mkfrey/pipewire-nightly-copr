@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        3%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -195,6 +195,10 @@ Conflicts:      pulseaudio
 Conflicts:      %{name}-libpulse < 0.3.13-6
 Conflicts:      %{name}-pulseaudio < 0.3.13-6
 
+# Virtual Provides to support swapping between PipeWire-PA and PA
+Provides:       pulseaudio-daemon
+Conflicts:      pulseaudio-daemon
+
 %description pulseaudio
 This package provides a PulseAudio implementation based on PipeWire
 %endif
@@ -264,11 +268,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %if 0%{?enable_pulse}
 %post pulseaudio
-%{?ldconfig}
 %systemd_user_post pipewire-pulse.service
 %systemd_user_post pipewire-pulse.socket
-
-%ldconfig_postun
 %endif
 
 %files
@@ -376,6 +377,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Nov 24 2020 Neal Gompa <ngompa13@gmail.com> - 0.3.16-4
+- Add 'pulseaudio-daemon' Provides + Conflicts to pipewire-pulseaudio
+- Remove useless ldconfig macros that expand to nothing
+
 * Fri Nov 20 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.16-3
 - Fix Requires for pipewire-pulseaudio
 - Fixes rhbz#1899945
