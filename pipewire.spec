@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 16
+%global microversion 17
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        4%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -41,7 +41,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch0:         0001-hook-zero-hooks-before-adding-them.patch
 
 ## upstreamable patches
 
@@ -206,8 +205,6 @@ This package provides a PulseAudio implementation based on PipeWire
 %prep
 %setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
 
-%patch0 -p1 -b .0000
-
 %build
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
@@ -232,6 +229,7 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
 %endif
 
 # upstream should use udev.pc
@@ -280,6 +278,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
+%dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %{_mandir}/man5/pipewire.conf.5*
 
@@ -353,6 +352,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if 0%{?enable_jack}
@@ -362,6 +362,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
 
 %files libjack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
@@ -374,9 +375,13 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
 %endif
 
 %changelog
+* Thu Nov 26 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-1
+- Update to 0.3.17
+
 * Tue Nov 24 2020 Neal Gompa <ngompa13@gmail.com> - 0.3.16-4
 - Add 'pulseaudio-daemon' Provides + Conflicts to pipewire-pulseaudio
 - Remove useless ldconfig macros that expand to nothing
