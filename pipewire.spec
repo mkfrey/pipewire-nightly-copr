@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -197,6 +197,8 @@ Conflicts:      %{name}-pulseaudio < 0.3.13-6
 # Virtual Provides to support swapping between PipeWire-PA and PA
 Provides:       pulseaudio-daemon
 Conflicts:      pulseaudio-daemon
+Provides:       pulseaudio-module-bluetooth
+Provides:       pulseaudio-module-jack
 
 %description pulseaudio
 This package provides a PulseAudio implementation based on PipeWire
@@ -379,6 +381,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
+- Add some more Provides: for pulseaudio
+
 * Thu Nov 26 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-1
 - Update to 0.3.17
 
