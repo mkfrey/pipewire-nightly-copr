@@ -308,6 +308,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/doc/pipewire/html
 
 %files utils
+%{_bindir}/pw-dump
 %{_bindir}/pw-mon
 %{_bindir}/pw-metadata
 %{_bindir}/pw-mididump
