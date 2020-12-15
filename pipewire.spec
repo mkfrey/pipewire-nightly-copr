@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 17
+%global microversion 18
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -29,7 +29,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?gitrel}
@@ -329,6 +329,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
+%{_bindir}/pw-dump
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
@@ -381,6 +382,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
+- Update to 0.3.18
+
 * Thu Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
 - Add some more Provides: for pulseaudio
 
