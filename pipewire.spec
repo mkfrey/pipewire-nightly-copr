@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 17
+%global microversion 18
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -186,6 +186,8 @@ Conflicts:      %{name}-pulseaudio < 0.3.13-6
 # Virtual Provides to support swapping between PipeWire-PA and PA
 Provides:       pulseaudio-daemon
 Conflicts:      pulseaudio-daemon
+Provides:       pulseaudio-module-bluetooth
+Provides:       pulseaudio-module-jack
 
 %description pulseaudio
 This package provides a PulseAudio implementation based on PipeWire
@@ -308,7 +310,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/doc/pipewire/html
 
 %files utils
-%{_bindir}/pw-dump
 %{_bindir}/pw-mon
 %{_bindir}/pw-metadata
 %{_bindir}/pw-mididump
@@ -317,6 +318,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
+%{_bindir}/pw-dump
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
@@ -369,6 +371,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
+- Update to 0.3.18
+
+* Thu Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
+- Add some more Provides: for pulseaudio
+
 * Thu Nov 26 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-1
 - Update to 0.3.17
 
