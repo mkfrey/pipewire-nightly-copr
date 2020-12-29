@@ -59,6 +59,7 @@ BuildRequires:  xmltoman
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
+BuildRequires:  ncurses-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -109,6 +110,7 @@ Summary:        PipeWire media server utilities
 License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       ncurses-libs
 
 %description utils
 This package contains command line utilities for the PipeWire media server.
@@ -315,6 +317,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-mididump
 %{_bindir}/pw-midiplay
 %{_bindir}/pw-midirecord
+%{_bindir}/pw-top
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
