@@ -273,6 +273,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs
