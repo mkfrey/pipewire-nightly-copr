@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 18
+%global microversion 19
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -319,7 +319,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-mididump
 %{_bindir}/pw-midiplay
 %{_bindir}/pw-midirecord
-%{_bindir}/pw-top
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
@@ -328,6 +327,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
 %{_bindir}/pw-reserve
+%{_bindir}/pw-top
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
@@ -376,6 +376,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jan 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
+- Update to 0.3.19
+- Add ncurses-devel BR
+
 * Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
 - Update to 0.3.18
 
