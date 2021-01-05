@@ -70,6 +70,7 @@ BuildRequires:  xmltoman
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
+BuildRequires:  ncurses-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -385,8 +386,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
-* Tue Jan 4 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
+* Tue Jan 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
 - Update to 0.3.19
+- Add ncurses-devel BR
 
 * Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
 - Update to 0.3.18
