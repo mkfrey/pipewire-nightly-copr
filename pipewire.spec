@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 18
+%global microversion 19
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -282,6 +282,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs
@@ -334,6 +336,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
 %{_bindir}/pw-reserve
+%{_bindir}/pw-top
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
@@ -382,6 +385,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jan 4 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
+- Update to 0.3.19
+
 * Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
 - Update to 0.3.18
 
