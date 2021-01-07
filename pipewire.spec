@@ -28,7 +28,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        1%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+Release:        2%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?snapdate}
@@ -134,25 +134,6 @@ This package contains an ALSA plugin for the PipeWire media server.
 %endif
 
 %if 0%{?enable_jack}
-%package libjack
-Summary:        PipeWire libjack library
-License:        MIT
-Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
-Conflicts:      jack-audio-connection-kit
-Conflicts:      jack-audio-connection-kit-dbus
-# Renamed in F32
-Obsoletes:      pipewire-jack < 0.2.96-2
-# Fixed jack subpackages
-Conflicts:      %{name}-libjack < 0.3.13-6
-Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
-Obsoletes:      %{name}-jack-audio-connection-kit < 0.3.13-6
-
-%description libjack
-This package contains a PipeWire replacement for JACK audio connection kit
-"libjack" library.
-
 %package jack-audio-connection-kit
 Summary:        PipeWire JACK implementation
 License:        MIT
@@ -164,6 +145,10 @@ Conflicts:      jack-audio-connection-kit-dbus
 # Fixed jack subpackages
 Conflicts:      %{name}-libjack < 0.3.13-6
 Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
+# Replaces libjack subpackage
+Obsoletes:      %{name}-libjack < 0.3.19-2
+Provides:       %{name}-libjack = %{version}-%{release}
+Provides:       %{name}-libjack%{?_isa} = %{version}-%{release}
 
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
@@ -367,8 +352,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
-
-%files libjack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
 %files plugin-jack
@@ -383,6 +366,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jan  7 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-2
+- Obsolete useless libjack subpackage with jack-audio-connection-kit subpackage
+
 * Tue Jan 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
 - Update to 0.3.19
 - Add ncurses-devel BR
