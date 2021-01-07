@@ -7,10 +7,9 @@
 %global soversion    0
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
-#global snap       20141103
-#global gitrel     327
-#global gitcommit  aec811798cd883a454b9b5cd82c77831906bbd2d
-#global shortcommit %(c=%{gitcommit}; echo ${c:0:5})
+#global snapdate   20210107
+#global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
+#global shortcommit %(c=%{gitcommit}; echo ${c:0:7})
 
 # https://bugzilla.redhat.com/983606
 %global _hardened_build 1
@@ -29,13 +28,11 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        1%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+Release:        1%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
-%if 0%{?gitrel}
-# git clone git://anongit.freedesktop.org/gstreamer/pipewire
-# cd pipewire; git reset --hard %{gitcommit}; ./autogen.sh; make; make distcheck
-Source0:        pipewire-%{version}-%{gitrel}-g%{shortcommit}.tar.gz
+%if 0%{?snapdate}
+Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{gitcommit}/pipewire-%{shortcommit}.tar.gz
 %else
 Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
 %endif
@@ -206,7 +203,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %endif
 
 %prep
-%setup -q -T -b0 -n %{name}-%{version}%{?gitrel:-%{gitrel}-g%{shortcommit}}
+%autosetup -p1 %{?snapdate:-n %{name}-%{gitcommit}}
 
 %build
 %meson \
