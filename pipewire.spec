@@ -390,7 +390,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 * Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
 - Update to 0.3.18
 
-* Thu Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
+* Fri Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
 - Add some more Provides: for pulseaudio
 
 * Thu Nov 26 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-1
