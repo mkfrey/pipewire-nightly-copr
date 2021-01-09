@@ -28,7 +28,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        2%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+Release:        3%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?snapdate}
@@ -55,6 +55,12 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
+# libldac is not built on x390x, see rhbz#1677491
+%ifnarch s390x
+BuildRequires:  pkgconfig(ldacBT-enc)
+BuildRequires:  pkgconfig(ldacBT-abr)
+%endif
+BuildRequires:  pkgconfig(fdk-aac)
 %if 0%{?enable_vulkan}
 BuildRequires:  pkgconfig(vulkan)
 %endif
