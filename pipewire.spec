@@ -375,6 +375,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Sat Jan  9 2021 Evan Anderson <evan@eaanderson.com> - 0.3.19-3
+- Add LDAC and AAC dependency to enhance Bluetooth support
+
 * Thu Jan  7 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-2
 - Obsolete useless libjack subpackage with jack-audio-connection-kit subpackage
 
