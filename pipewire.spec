@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 4
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -20,13 +20,24 @@
 # where/how to apply multilib hacks
 %global multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
 
-%global enable_alsa 1
+# Build conditions for various features
+%bcond_without alsa
+%bcond_without vulkan
 
-%if 0%{?fedora}
-%global enable_jack 1
-%global enable_pulse 1
-%global enable_vulkan 1
+# Features disabled for RHEL 8
+%if 0%{?rhel} && 0%{?rhel} < 9
+%bcond_with pulse
+%else
+%bcond_without pulse
 %endif
+
+# Features disabled for RHEL
+%if 0%{?rhel}
+%bcond_with jack
+%else
+%bcond_without jack
+%endif
+
 
 Name:           pipewire
 Summary:        Media Sharing Server
@@ -64,7 +75,7 @@ BuildRequires:  pkgconfig(ldacBT-enc)
 BuildRequires:  pkgconfig(ldacBT-abr)
 %endif
 BuildRequires:  pkgconfig(fdk-aac)
-%if 0%{?enable_vulkan}
+%if %{with vulkan}
 BuildRequires:  pkgconfig(vulkan)
 %endif
 BuildRequires:  pkgconfig(bluez)
@@ -131,7 +142,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 %package alsa
 Summary:        PipeWire media server ALSA support
 License:        MIT
@@ -142,7 +153,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 This package contains an ALSA plugin for the PipeWire media server.
 %endif
 
-%if 0%{?enable_jack}
+%if %{with jack}
 %package jack-audio-connection-kit
 Summary:        PipeWire JACK implementation
 License:        MIT
@@ -174,7 +185,7 @@ Requires:       jack-audio-connection-kit
 This package contains the PipeWire spa plugin to connect to a JACK server.
 %endif
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %package pulseaudio
 Summary:        PipeWire PulseAudio implementation
 License:        MIT
@@ -203,27 +214,35 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
-    %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?enable_pulse:-D pipewire-pulseaudio=false}			\
-    %{!?enable_alsa:-D pipewire-alsa=false}				\
-    %{!?enable_vulkan:-D vulkan=false}
+    %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
+    %{!?with_alsa:-D pipewire-alsa=false}				\
+    %{!?with_vulkan:-D vulkan=false}
 %meson_build
 
 %install
 %meson_install
 
-%if 0%{?enable_jack}
+%if %{with jack}
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
+%else
+rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
 %endif
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 mkdir -p %{buildroot}%{_sysconfdir}/alsa/conf.d/
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
+%endif
+
+%if ! %{with pulse}
+# If the PulseAudio replacement isn't being offered, delete the files
+rm %{buildroot}%{_bindir}/pipewire-pulse
+rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
+rm -rf %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
 %endif
 
 # upstream should use udev.pc
@@ -258,7 +277,7 @@ exit 0
 # Remove before F33.
 systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %post pulseaudio
 %systemd_user_post pipewire-pulse.service
 %systemd_user_post pipewire-pulse.socket
@@ -297,7 +316,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/support/
 %{_libdir}/spa-%{spaversion}/v4l2/
 %{_libdir}/spa-%{spaversion}/videoconvert/
-%if 0%{?enable_vulkan}
+%if %{with vulkan}
 %{_libdir}/spa-%{spaversion}/vulkan/
 %endif
 
@@ -342,7 +361,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/spa-monitor
 %{_bindir}/spa-resample
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 %files alsa
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 %{_libdir}/alsa-lib/libasound_module_ctl_pipewire.so
@@ -353,7 +372,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-alsa
 %endif
 
-%if 0%{?enable_jack}
+%if %{with jack}
 %files jack-audio-connection-kit
 %{_bindir}/pw-jack
 %{_mandir}/man1/pw-jack.1*
@@ -367,7 +386,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/jack/
 %endif
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
@@ -375,6 +394,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jan 12 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-4
+- Rework conditional build to fix ELN builds
+
 * Sat Jan  9 2021 Evan Anderson <evan@eaanderson.com> - 0.3.19-3
 - Add LDAC and AAC dependency to enhance Bluetooth support
 
