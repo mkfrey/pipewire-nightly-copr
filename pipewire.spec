@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 19
+%global microversion 20
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -245,6 +245,8 @@ rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
 rm -rf %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
 %endif
 
+%find_lang %{name}
+
 # upstream should use udev.pc
 mkdir -p %{buildroot}%{_prefix}/lib/udev/rules.d
 mv -fv %{buildroot}/lib/udev/rules.d/90-pipewire-alsa.rules %{buildroot}%{_prefix}/lib/udev/rules.d
@@ -294,10 +296,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/v4l2-monitor.conf
 %{_mandir}/man5/pipewire.conf.5*
 
-%files libs
+%files libs -f %{name}.lang
 %license LICENSE COPYING
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
@@ -394,6 +398,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Jan 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.20-1
+- Update to 0.3.20
+
 * Tue Jan 12 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-4
 - Rework conditional build to fix ELN builds
 
