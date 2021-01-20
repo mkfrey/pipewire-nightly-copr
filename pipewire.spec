@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 4
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,6 +57,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 
+BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
@@ -400,6 +401,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %changelog
 * Wed Jan 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.20-1
 - Update to 0.3.20
+- Fix baseversion
+- Add gettext dependency
 
 * Tue Jan 12 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-4
 - Rework conditional build to fix ELN builds
