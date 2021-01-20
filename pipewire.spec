@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 19
+%global microversion 20
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -13,13 +13,24 @@
 # where/how to apply multilib hacks
 %global multilib_archs x86_64 %{ix86} ppc64 ppc s390x s390 sparc64 sparcv9 ppc64le
 
-%global enable_alsa 1
+# Build conditions for various features
+%bcond_without alsa
+%bcond_without vulkan
 
-%if 0%{?fedora}
-%global enable_jack 1
-%global enable_pulse 1
-%global enable_vulkan 1
+# Features disabled for RHEL 8
+%if 0%{?rhel} && 0%{?rhel} < 9
+%bcond_with pulse
+%else
+%bcond_without pulse
 %endif
+
+# Features disabled for RHEL
+%if 0%{?rhel}
+%bcond_with jack
+%else
+%bcond_without jack
+%endif
+
 
 Name:           pipewire
 Summary:        Media Sharing Server
@@ -35,6 +46,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipew
 
 ## fedora patches
 
+BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
@@ -47,7 +59,13 @@ BuildRequires:  pkgconfig(gstreamer-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-plugins-base-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-net-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
-%if 0%{?enable_vulkan}
+# libldac is not built on x390x, see rhbz#1677491
+%ifnarch s390x
+BuildRequires:  pkgconfig(ldacBT-enc)
+BuildRequires:  pkgconfig(ldacBT-abr)
+%endif
+BuildRequires:  pkgconfig(fdk-aac)
+%if %{with vulkan}
 BuildRequires:  pkgconfig(vulkan)
 %endif
 BuildRequires:  pkgconfig(bluez)
@@ -115,7 +133,7 @@ Requires:       ncurses-libs
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 %package alsa
 Summary:        PipeWire media server ALSA support
 License:        MIT
@@ -126,26 +144,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 This package contains an ALSA plugin for the PipeWire media server.
 %endif
 
-%if 0%{?enable_jack}
-%package libjack
-Summary:        PipeWire libjack library
-License:        MIT
-Recommends:     %{name}%{?_isa} = %{version}-%{release}
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
-Conflicts:      jack-audio-connection-kit
-Conflicts:      jack-audio-connection-kit-dbus
-# Renamed in F32
-Obsoletes:      pipewire-jack < 0.2.96-2
-# Fixed jack subpackages
-Conflicts:      %{name}-libjack < 0.3.13-6
-Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
-Obsoletes:      %{name}-jack-audio-connection-kit < 0.3.13-6
-
-%description libjack
-This package contains a PipeWire replacement for JACK audio connection kit
-"libjack" library.
-
+%if %{with jack}
 %package jack-audio-connection-kit
 Summary:        PipeWire JACK implementation
 License:        MIT
@@ -157,6 +156,10 @@ Conflicts:      jack-audio-connection-kit-dbus
 # Fixed jack subpackages
 Conflicts:      %{name}-libjack < 0.3.13-6
 Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
+# Replaces libjack subpackage
+Obsoletes:      %{name}-libjack < 0.3.19-2
+Provides:       %{name}-libjack = %{version}-%{release}
+Provides:       %{name}-libjack%{?_isa} = %{version}-%{release}
 
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
@@ -173,7 +176,7 @@ Requires:       jack-audio-connection-kit
 This package contains the PipeWire spa plugin to connect to a JACK server.
 %endif
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %package pulseaudio
 Summary:        PipeWire PulseAudio implementation
 License:        MIT
@@ -202,21 +205,22 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
-    %{!?enable_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?enable_pulse:-D pipewire-pulseaudio=false}			\
-    %{!?enable_alsa:-D pipewire-alsa=false}				\
-    %{!?enable_vulkan:-D vulkan=false}
+    %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
+    %{!?with_alsa:-D pipewire-alsa=false}				\
+    %{!?with_vulkan:-D vulkan=false}
 %meson_build
 
 %install
 %meson_install
 
-%if 0%{?enable_jack}
+%if %{with jack}
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
+%else
+rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
 %endif
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 mkdir -p %{buildroot}%{_sysconfdir}/alsa/conf.d/
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
@@ -224,6 +228,15 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
 %endif
+
+%if ! %{with pulse}
+# If the PulseAudio replacement isn't being offered, delete the files
+rm %{buildroot}%{_bindir}/pipewire-pulse
+rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
+rm -rf %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+%endif
+
+%find_lang %{name}
 
 # upstream should use udev.pc
 mkdir -p %{buildroot}%{_prefix}/lib/udev/rules.d
@@ -257,7 +270,7 @@ exit 0
 # Remove before F33.
 systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %post pulseaudio
 %systemd_user_post pipewire-pulse.service
 %systemd_user_post pipewire-pulse.socket
@@ -274,12 +287,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
+%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/v4l2-monitor.conf
 %{_mandir}/man5/pipewire.conf.5*
 
-%files libs
+%files libs -f %{name}.lang
 %license LICENSE COPYING
 %doc README.md
 %{_libdir}/libpipewire-%{apiversion}.so.*
@@ -298,7 +311,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/support/
 %{_libdir}/spa-%{spaversion}/v4l2/
 %{_libdir}/spa-%{spaversion}/videoconvert/
-%if 0%{?enable_vulkan}
+%if %{with vulkan}
 %{_libdir}/spa-%{spaversion}/vulkan/
 %endif
 
@@ -343,7 +356,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/spa-monitor
 %{_bindir}/spa-resample
 
-%if 0%{?enable_alsa}
+%if %{with alsa}
 %files alsa
 %{_libdir}/alsa-lib/libasound_module_pcm_pipewire.so
 %{_libdir}/alsa-lib/libasound_module_ctl_pipewire.so
@@ -354,7 +367,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-alsa
 %endif
 
-%if 0%{?enable_jack}
+%if %{with jack}
 %files jack-audio-connection-kit
 %{_bindir}/pw-jack
 %{_mandir}/man1/pw-jack.1*
@@ -362,15 +375,13 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
-
-%files libjack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
 %endif
 
-%if 0%{?enable_pulse}
+%if %{with pulse}
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
@@ -378,6 +389,20 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Jan 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.20-1
+- Update to 0.3.20
+- Fix baseversion
+- Add gettext dependency
+
+* Tue Jan 12 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-4
+- Rework conditional build to fix ELN builds
+
+* Sat Jan  9 2021 Evan Anderson <evan@eaanderson.com> - 0.3.19-3
+- Add LDAC and AAC dependency to enhance Bluetooth support
+
+* Thu Jan  7 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.19-2
+- Obsolete useless libjack subpackage with jack-audio-connection-kit subpackage
+
 * Tue Jan 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.19-1
 - Update to 0.3.19
 - Add ncurses-devel BR
@@ -385,7 +410,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 * Tue Dec 15 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.18-1
 - Update to 0.3.18
 
-* Thu Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
+* Fri Nov 27 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-2
 - Add some more Provides: for pulseaudio
 
 * Thu Nov 26 2020 Wim Taymans <wtaymans@redhat.com> - 0.3.17-1
