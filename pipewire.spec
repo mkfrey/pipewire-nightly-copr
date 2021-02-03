@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 20
+%global microversion 21
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -399,6 +399,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Feb 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-1
+- Update to 0.3.21
+
 * Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.20-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
