@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -52,6 +52,8 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
+Patch0:         0001-pulse-server-actually-fill-in-the-maxlenght-and-frag.patch
+Patch1:         0002-jack-implement-some-missing-methods.patch
 
 ## upstreamable patches
 
@@ -399,6 +401,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Feb 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-2
+- Add some upstream patches
+- Fixes rhbz#1925138
+
 * Wed Feb 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-1
 - Update to 0.3.21
 
