@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 20
+%global microversion 21
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -39,8 +39,6 @@ Release:        %(date +%%y%%m%%d)%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipewire-master.tar.gz
-
-## upstream patches
 
 ## upstreamable patches
 
@@ -389,6 +387,16 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Feb 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-2
+- Add some upstream patches
+- Fixes rhbz#1925138
+
+* Wed Feb 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-1
+- Update to 0.3.21
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Wed Jan 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.20-1
 - Update to 0.3.20
 - Fix baseversion
