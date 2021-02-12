@@ -283,6 +283,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
+%config(noreplace) %{_sysconfdir}/pipewire/client.conf
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
@@ -383,6 +384,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
+%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
 %endif
 
