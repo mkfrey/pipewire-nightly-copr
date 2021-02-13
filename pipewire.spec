@@ -15,7 +15,7 @@
 
 # Build conditions for various features
 %bcond_without alsa
-%bcond_without vulkan
+# %bcond_without vulkan
 
 # Features disabled for RHEL 8
 %if 0%{?rhel} && 0%{?rhel} < 9
@@ -63,9 +63,9 @@ BuildRequires:  pkgconfig(ldacBT-enc)
 BuildRequires:  pkgconfig(ldacBT-abr)
 %endif
 BuildRequires:  pkgconfig(fdk-aac)
-%if %{with vulkan}
-BuildRequires:  pkgconfig(vulkan)
-%endif
+# %if %{with vulkan}
+# BuildRequires:  pkgconfig(vulkan)
+# %endif
 BuildRequires:  pkgconfig(bluez)
 BuildRequires:  systemd-devel >= 184
 BuildRequires:  alsa-lib-devel
@@ -204,8 +204,8 @@ This package provides a PulseAudio implementation based on PipeWire
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
     %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?with_alsa:-D pipewire-alsa=false}				\
-    %{!?with_vulkan:-D vulkan=false}
+    %{!?with_alsa:-D pipewire-alsa=false}				
+    # %{!?with_vulkan:-D vulkan=false}
 %meson_build
 
 %install
@@ -310,9 +310,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/support/
 %{_libdir}/spa-%{spaversion}/v4l2/
 %{_libdir}/spa-%{spaversion}/videoconvert/
-%if %{with vulkan}
-%{_libdir}/spa-%{spaversion}/vulkan/
-%endif
+# %if %{with vulkan}
+# %{_libdir}/spa-%{spaversion}/vulkan/
+# %endif
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
