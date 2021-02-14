@@ -355,6 +355,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/spa-inspect
 %{_bindir}/spa-monitor
 %{_bindir}/spa-resample
+%{_bindir}/spa-json-dump
 
 %if %{with alsa}
 %files alsa
