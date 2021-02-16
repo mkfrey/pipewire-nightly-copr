@@ -285,7 +285,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %dir %{_sysconfdir}/pipewire/media-session.d/
 %config(noreplace) %{_sysconfdir}/pipewire/client.conf
 %config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
-%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
@@ -376,6 +375,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
+%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
