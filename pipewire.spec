@@ -203,6 +203,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
+    -D sdl2=false                               \
     %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
     %{!?with_alsa:-D pipewire-alsa=false}				\
     %{?with_vulkan:-D vulkan=true}
