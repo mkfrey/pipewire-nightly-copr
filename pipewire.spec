@@ -76,7 +76,6 @@ BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
-BuildRequires:  pkgconfig(SDL2-devel)
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
