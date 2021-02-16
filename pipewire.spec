@@ -76,6 +76,7 @@ BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
+BuildRequires:  SDL2-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -203,7 +204,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
     -D gstreamer-device-provider=false					\
-    -D sdl2=false                               \
+    -D sdl2=enabled -D sndfile=enabled          \
     %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
     %{!?with_alsa:-D pipewire-alsa=false}				\
     %{?with_vulkan:-D vulkan=true}
