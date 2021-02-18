@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 21
+%global microversion 22
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -52,8 +52,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 %endif
 
 ## upstream patches
-Patch0:         0001-pulse-server-actually-fill-in-the-maxlenght-and-frag.patch
-Patch1:         0002-jack-implement-some-missing-methods.patch
 
 ## upstreamable patches
 
@@ -219,7 +217,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D gstreamer-device-provider=false					\
     %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
     %{!?with_alsa:-D pipewire-alsa=false}				\
-    %{!?with_vulkan:-D vulkan=false}
+    %{?with_vulkan:-D vulkan=true}
 %meson_build
 
 %install
@@ -297,7 +295,11 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
+%config(noreplace) %{_sysconfdir}/pipewire/client.conf
+%config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
+%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
+%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
@@ -365,6 +367,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %{_bindir}/spa-acp-tool
 %{_bindir}/spa-inspect
+%{_bindir}/spa-json-dump
 %{_bindir}/spa-monitor
 %{_bindir}/spa-resample
 
@@ -401,6 +404,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Feb 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-1
+- Update to 0.3.22
+
 * Thu Feb 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-2
 - Add some upstream patches
 - Fixes rhbz#1925138
