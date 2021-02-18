@@ -214,7 +214,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %build
 %meson \
     -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
-    -D gstreamer-device-provider=false					\
+    -D gstreamer-device-provider=false -D sdl2=disabled			\
     %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
     %{!?with_alsa:-D pipewire-alsa=false}				\
     %{?with_vulkan:-D vulkan=true}
@@ -406,6 +406,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %changelog
 * Thu Feb 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-1
 - Update to 0.3.22
+- disable sdl2 examples
 
 * Thu Feb 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-2
 - Add some upstream patches
