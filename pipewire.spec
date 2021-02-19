@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 3
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -149,6 +149,14 @@ Summary:        PipeWire media server ALSA support
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
+# Ensure this is provided by default to route all audio
+Supplements:    %{name} = %{version}-%{release}
+# Replace PulseAudio and JACK ALSA plugins with PipeWire
+## N.B.: If alsa-plugins gets updated in F33, this will need to be bumped
+Obsoletes:      alsa-plugins-jack < 1.2.2-5
+Obsoletes:      alsa-plugins-pulseaudio < 1.2.2-5
+%endif
 
 %description alsa
 This package contains an ALSA plugin for the PipeWire media server.
@@ -210,6 +218,9 @@ Supplements:    %{name} = %{version}-%{release}
 # Replace PulseAudio with PipeWire-PulseAudio
 ## N.B.: If pulseaudio gets updated in F33, this will need to be bumped
 Obsoletes:      pulseaudio < 14.2-3
+Obsoletes:      pulseaudio-module-bluetooth < 14.2-3
+Obsoletes:      pulseaudio-module-jack < 14.2-3
+Obsoletes:      pulseaudio-module-x11 < 14.2-3
 %endif
 
 # Virtual Provides to support swapping between PipeWire-PA and PA
@@ -418,6 +429,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-3
+- Replace ALSA plugins and PulseAudio modules on upgrade in F34+
+
 * Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-2
 - Replace JACK and PulseAudio on upgrade in F34+
   Reference: https://fedoraproject.org/wiki/Changes/DefaultPipeWire
