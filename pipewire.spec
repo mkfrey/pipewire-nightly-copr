@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -170,6 +170,13 @@ Conflicts:      %{name}-jack-audio-connection-kit < 0.3.13-6
 Obsoletes:      %{name}-libjack < 0.3.19-2
 Provides:       %{name}-libjack = %{version}-%{release}
 Provides:       %{name}-libjack%{?_isa} = %{version}-%{release}
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
+# Ensure this is provided by default to route all audio
+Supplements:    %{name} = %{version}-%{release}
+# Replace JACK with PipeWire-JACK
+## N.B.: If jack gets updated in F33, this will need to be bumped
+Obsoletes:      jack-audio-connection-kit < 1.9.16-2
+%endif
 
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
@@ -197,6 +204,13 @@ Conflicts:      pulseaudio
 # Fixed pulseaudio subpackages
 Conflicts:      %{name}-libpulse < 0.3.13-6
 Conflicts:      %{name}-pulseaudio < 0.3.13-6
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
+# Ensure this is provided by default to route all audio
+Supplements:    %{name} = %{version}-%{release}
+# Replace PulseAudio with PipeWire-PulseAudio
+## N.B.: If pulseaudio gets updated in F33, this will need to be bumped
+Obsoletes:      pulseaudio < 14.2-3
+%endif
 
 # Virtual Provides to support swapping between PipeWire-PA and PA
 Provides:       pulseaudio-daemon
@@ -404,6 +418,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-2
+- Replace JACK and PulseAudio on upgrade in F34+
+  Reference: https://fedoraproject.org/wiki/Changes/DefaultPipeWire
+
 * Thu Feb 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-1
 - Update to 0.3.22
 - disable sdl2 examples
