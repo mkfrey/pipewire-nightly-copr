@@ -208,9 +208,15 @@ Supplements:    %{name} = %{version}-%{release}
 # Replace PulseAudio with PipeWire-PulseAudio
 ## N.B.: If pulseaudio gets updated in F33, this will need to be bumped
 Obsoletes:      pulseaudio < 14.2-3
+Obsoletes:      pulseaudio-esound-compat < 14.2-3
 Obsoletes:      pulseaudio-module-bluetooth < 14.2-3
+Obsoletes:      pulseaudio-module-gconf < 14.2-3
+Obsoletes:      pulseaudio-module-gsettings < 14.2-3
 Obsoletes:      pulseaudio-module-jack < 14.2-3
+Obsoletes:      pulseaudio-module-lirc < 14.2-3
 Obsoletes:      pulseaudio-module-x11 < 14.2-3
+Obsoletes:      pulseaudio-module-zeroconf < 14.2-3
+Obsoletes:      pulseaudio-qpaeq < 14.2-3
 %endif
 
 # Virtual Provides to support swapping between PipeWire-PA and PA
