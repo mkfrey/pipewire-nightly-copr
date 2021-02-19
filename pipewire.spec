@@ -139,6 +139,14 @@ Summary:        PipeWire media server ALSA support
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+%if ! (0%{?fedora} && 0%{?fedora} < 34)
+# Ensure this is provided by default to route all audio
+Supplements:    %{name} = %{version}-%{release}
+# Replace PulseAudio and JACK ALSA plugins with PipeWire
+## N.B.: If alsa-plugins gets updated in F33, this will need to be bumped
+Obsoletes:      alsa-plugins-jack < 1.2.2-5
+Obsoletes:      alsa-plugins-pulseaudio < 1.2.2-5
+%endif
 
 %description alsa
 This package contains an ALSA plugin for the PipeWire media server.
@@ -200,6 +208,9 @@ Supplements:    %{name} = %{version}-%{release}
 # Replace PulseAudio with PipeWire-PulseAudio
 ## N.B.: If pulseaudio gets updated in F33, this will need to be bumped
 Obsoletes:      pulseaudio < 14.2-3
+Obsoletes:      pulseaudio-module-bluetooth < 14.2-3
+Obsoletes:      pulseaudio-module-jack < 14.2-3
+Obsoletes:      pulseaudio-module-x11 < 14.2-3
 %endif
 
 # Virtual Provides to support swapping between PipeWire-PA and PA
