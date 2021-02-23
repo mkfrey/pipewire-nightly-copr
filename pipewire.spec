@@ -281,6 +281,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %license LICENSE COPYING
 %doc README.md
 %{_userunitdir}/pipewire.*
+%{_userunitdir}/pipewire-media-session.*
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
