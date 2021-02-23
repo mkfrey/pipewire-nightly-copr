@@ -263,6 +263,7 @@ exit 0
 %post
 %systemd_user_post pipewire.service
 %systemd_user_post pipewire.socket
+%systemd_user_post pipewire-media-session.service
 
 %triggerun -- %{name} < 0.3.6-2
 # This is for upgrades from previous versions which had a static symlink.
