@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 5
+%global baserelease 6
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -56,14 +56,19 @@ Patch0:    0001-bluez5-include-a2dp-codec-profiles-in-route-profiles.patch
 Patch1:    0005-fix-some-warnings.patch
 Patch2:    0006-spa-escape-double-quotes.patch
 Patch3:    0009-bluez5-volumes-need-to-be-distributed-to-all-channel.patch
-Patch4:    0011-bluez5-backend-native-Check-volume-values.patch
-Patch5:    0012-media-session-don-t-switch-to-pro-audio-by-default.patch
-Patch6:    0013-audioconvert-keep-better-track-of-param-changes.patch
-Patch7:    0018-pulse-server-print-encoding-name-in-format_info.patch
-Patch8:    0019-pulse-server-handle-unsupported-formats.patch
-Patch9:    0022-pw-cli-always-output-to-stdout.patch
-Patch10:   0024-policy-node-don-t-crash-without-metadata.patch
-Patch11:   0025-bluez5-route-shouldn-t-list-a2dp-profiles-when-not-c.patch
+Patch4:    0010-bluez5-set-the-right-volumes-on-the-node.patch
+Patch5:    0011-bluez5-backend-native-Check-volume-values.patch
+Patch6:    0012-media-session-don-t-switch-to-pro-audio-by-default.patch
+Patch7:    0013-audioconvert-keep-better-track-of-param-changes.patch
+Patch8:    0018-pulse-server-print-encoding-name-in-format_info.patch
+Patch9:    0019-pulse-server-handle-unsupported-formats.patch
+Patch10:   0021-jack-handle-client-init-error-with-EIO.patch
+Patch11:   0022-pw-cli-always-output-to-stdout.patch
+Patch12:   0024-policy-node-don-t-crash-without-metadata.patch
+Patch13:   0025-bluez5-route-shouldn-t-list-a2dp-profiles-when-not-c.patch
+Patch14:   0027-jack-apply-PIPEWIRE_PROPS-after-reading-config.patch
+Patch15:   0038-jack-add-config-option-to-shorten-and-filter-names.patch
+Patch16:   0046-jack-fix-names-of-our-ports.patch
 
 ## upstreamable patches
 
@@ -447,6 +452,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Feb 24 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-6
+- Add patch for jack names
+
 * Mon Feb 22 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-5
 - Add some critical patches
 
