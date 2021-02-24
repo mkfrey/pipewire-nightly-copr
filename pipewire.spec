@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 6
+%global baserelease 7
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -69,6 +69,7 @@ Patch13:   0025-bluez5-route-shouldn-t-list-a2dp-profiles-when-not-c.patch
 Patch14:   0027-jack-apply-PIPEWIRE_PROPS-after-reading-config.patch
 Patch15:   0038-jack-add-config-option-to-shorten-and-filter-names.patch
 Patch16:   0046-jack-fix-names-of-our-ports.patch
+Patch17:   0001-pulse-server-don-t-use-the-pending_sample-after-free.patch
 
 ## upstreamable patches
 
@@ -452,6 +453,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Feb 24 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-7
+- Add patch to sample destroy use after free
+
 * Wed Feb 24 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-6
 - Add patch for jack names
 
