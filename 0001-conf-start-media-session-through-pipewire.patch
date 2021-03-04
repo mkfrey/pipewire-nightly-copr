@@ -1,0 +1,25 @@
+From b07f03311167aa9489370a4df624510b1e93ef79 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 4 Mar 2021 15:38:16 +0100
+Subject: [PATCH] conf: start media-session through pipewire
+
+---
+ src/daemon/pipewire.conf.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/pipewire.conf.in b/src/daemon/pipewire.conf.in
+index ed4ee3b29..b4053f9de 100644
+--- a/src/daemon/pipewire.conf.in
++++ b/src/daemon/pipewire.conf.in
+@@ -203,7 +203,7 @@ context.exec = {
+     # but it is better to start it as a systemd service.
+     # Run the session manager with -h for options.
+     #
+-    @comment@"@media_session_path@" = { args = "" }
++    "@media_session_path@" = { args = "" }
+     #
+     # You can optionally start the pulseaudio-server here as well
+     # but it is better to start it as a systemd service.
+-- 
+2.26.2
+
