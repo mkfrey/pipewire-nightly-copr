@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,6 +57,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:    0001-conf-start-media-session-through-pipewire.patch
+Patch1:    0002-alsa-pass-the-right-direction-to-ucm_set_port.patch
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -439,6 +440,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Mar 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.23-2
+- Add patch to enable UCM Microphones
+
 * Thu Mar 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.23-1
 - Update to 0.3.23
 
