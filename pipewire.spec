@@ -202,12 +202,16 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %build
 %meson \
-    -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
-    -D gstreamer-device-provider=false					\
+    -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled 		\
+    -D systemd-system-service=disabled \
+    -D audiotestsrc=disabled \
+    -D videotestsrc=disabled \
+    -D volume=disabled \
+    -D gstreamer-device-provider=disabled					\
     -D sdl2=enabled -D sndfile=enabled          \
-    %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?with_alsa:-D pipewire-alsa=false}				\
-    %{?with_vulkan:-D vulkan=true}
+    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 		\
+    %{!?with_alsa:-D pipewire-alsa=disabled}				\
+    %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
 %install
