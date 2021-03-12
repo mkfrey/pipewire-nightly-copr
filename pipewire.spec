@@ -203,10 +203,10 @@ This package provides a PulseAudio implementation based on PipeWire
 %build
 %meson \
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled 		\
-    -D systemd-system-service=disabled \
     -D audiotestsrc=disabled \
     -D videotestsrc=disabled \
     -D volume=disabled \
+    -D libcamera=disabled \
     -D gstreamer-device-provider=disabled					\
     -D sdl2=enabled -D sndfile=enabled          \
     %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 		\
