@@ -77,6 +77,7 @@ BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  SDL2-devel
+BuildRequires:  libldac-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -209,6 +210,9 @@ This package provides a PulseAudio implementation based on PipeWire
     -D libcamera=disabled \
     -D gstreamer-device-provider=disabled					\
     -D sdl2=enabled -D sndfile=enabled          \
+    -D bluez5-codec-aptx=disabled  \
+    -D bluez5-codec-aac=disabled  \
+    -D bluez5-codec-ldac=enabled  \
     %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 		\
     %{!?with_alsa:-D pipewire-alsa=disabled}				\
     %{?with_vulkan:-D vulkan=enabled}
