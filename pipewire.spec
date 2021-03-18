@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 23
+%global microversion 24
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,7 +57,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:    0001-conf-start-media-session-through-pipewire.patch
-Patch1:    0002-alsa-pass-the-right-direction-to-ucm_set_port.patch
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -246,11 +245,16 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %build
 %meson \
-    -D docs=true -D man=true -D gstreamer=true -D systemd=true 		\
-    -D gstreamer-device-provider=false -D sdl2=disabled			\
-    %{!?with_jack:-D jack=false -D pipewire-jack=false} 		\
-    %{!?with_alsa:-D pipewire-alsa=false}				\
-    %{?with_vulkan:-D vulkan=true}
+    -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
+    -D gstreamer-device-provider=disabled -D sdl2=disabled 			\
+    -D libcamera=disabled -D audiotestsrc=disabled -D videotestsrc=disabled	\
+    -D volume=disabled -D bluez5-codec-aptx=disabled 				\
+%ifarch s390x
+    -D bluez5-codec-ldac=disabled						\
+%endif
+    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 			\
+    %{!?with_alsa:-D pipewire-alsa=disabled}					\
+    %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
 %install
@@ -440,6 +444,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Mar 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-1
+- Update to 0.3.24
+
 * Tue Mar 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.23-2
 - Add patch to enable UCM Microphones
 
