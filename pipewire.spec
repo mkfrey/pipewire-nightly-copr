@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 3
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -264,6 +264,7 @@ This package provides a PulseAudio implementation based on PipeWire
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
+rm %{buildroot}%{_sysconfdir}/pipewire/jack.conf
 rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
 %endif
 
@@ -280,7 +281,8 @@ touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm -rf %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_sysconfdir}/pipewire/pipewire-pulse.conf
 %endif
 
 # We don't start the media session with systemd yet
@@ -444,6 +446,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-3
+- Fix RHEL build
+
 * Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-2
 - Move individual config files to the subpackages that make use of them
 
