@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 4
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,6 +57,16 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:    0001-conf-start-media-session-through-pipewire.patch
+Patch1:    0002-pipewire-pulse-set-correct-errno-values.patch
+Patch2:    0003-media-session-check-stream-move-after-configuring-a-.patch
+Patch3:    0004-pulse-server-don-t-send-invalid-port-profile-arrays.patch
+Patch4:    0005-pulse-server-fix-route-profile-numbering.patch
+Patch5:    0006-impl-node-first-start-the-node-then-make-it-schedula.patch
+Patch6:    0007-alsa-never-queue-buffers-when-rate-matching.patch
+Patch7:    0008-pulse-server-handle-NULL-proxy.patch
+Patch8:    0009-impl-port-only-add-the-port-when-buffers-are-negotia.patch
+Patch9:    0010-pulse-server-avoid-returning-NULL-strings.patch
+
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -446,6 +456,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Mar 25 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-4
+- Apply some critical upstream patches
+
 * Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-3
 - Fix RHEL build
 

@@ -1,0 +1,82 @@
+From e5a58f1abb75fd1d51f4e769f0fffdc287ecd2d1 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 25 Mar 2021 09:08:13 +0100
+Subject: [PATCH 08/10] pulse-server: handle NULL proxy
+
+The proxy could be removed before we get the global remove so we need
+to handle the case where we access an object without a proxy and
+avoid a crash.
+---
+ src/modules/module-protocol-pulse/manager.c      |  2 ++
+ src/modules/module-protocol-pulse/pulse-server.c | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/src/modules/module-protocol-pulse/manager.c b/src/modules/module-protocol-pulse/manager.c
+index 184b08035..78b8d1bb8 100644
+--- a/src/modules/module-protocol-pulse/manager.c
++++ b/src/modules/module-protocol-pulse/manager.c
+@@ -711,6 +711,8 @@ int pw_manager_set_metadata(struct pw_manager *manager,
+ 		return -ENOTSUP;
+ 	if (!SPA_FLAG_IS_SET(metadata->permissions, PW_PERM_W|PW_PERM_X))
+ 		return -EACCES;
++	if (metadata->proxy == NULL)
++		return -ENOENT;
+ 
+ 	if (type != NULL) {
+ 		va_start(args, format);
+diff --git a/src/modules/module-protocol-pulse/pulse-server.c b/src/modules/module-protocol-pulse/pulse-server.c
+index 7a6082198..8efd2d609 100644
+--- a/src/modules/module-protocol-pulse/pulse-server.c
++++ b/src/modules/module-protocol-pulse/pulse-server.c
+@@ -3034,6 +3034,8 @@ static int set_node_volume_mute(struct pw_manager_object *o,
+ 
+ 	if (!SPA_FLAG_IS_SET(o->permissions, PW_PERM_W | PW_PERM_X))
+ 		return -EACCES;
++	if (o->proxy == NULL)
++		return -ENOENT;
+ 
+ 	spa_pod_builder_push_object(&b, &f[0],
+ 			SPA_TYPE_OBJECT_Props,  SPA_PARAM_Props);
+@@ -3064,6 +3066,9 @@ static int set_card_volume_mute_delay(struct pw_manager_object *o, uint32_t id,
+ 	if (!SPA_FLAG_IS_SET(o->permissions, PW_PERM_W | PW_PERM_X))
+ 		return -EACCES;
+ 
++	if (o->proxy == NULL)
++		return -ENOENT;
++
+ 	spa_pod_builder_push_object(&b, &f[0],
+ 			SPA_TYPE_OBJECT_ParamRoute, SPA_PARAM_Route);
+ 	spa_pod_builder_add(&b,
+@@ -3104,6 +3109,9 @@ static int set_card_port(struct pw_manager_object *o, uint32_t device_id,
+ 	if (!SPA_FLAG_IS_SET(o->permissions, PW_PERM_W | PW_PERM_X))
+ 		return -EACCES;
+ 
++	if (o->proxy == NULL)
++		return -ENOENT;
++
+ 	pw_device_set_param((struct pw_device*)o->proxy,
+ 			SPA_PARAM_Route, 0,
+ 			spa_pod_builder_add_object(&b,
+@@ -4888,6 +4896,9 @@ static int do_set_profile(struct client *client, uint32_t command, uint32_t tag,
+ 	if (!SPA_FLAG_IS_SET(o->permissions, PW_PERM_W | PW_PERM_X))
+ 		return -EACCES;
+ 
++	if (o->proxy == NULL)
++		return -ENOENT;
++
+         pw_device_set_param((struct pw_device*)o->proxy,
+                         SPA_PARAM_Profile, 0,
+                         spa_pod_builder_add_object(&b,
+@@ -4960,6 +4971,9 @@ static int do_suspend(struct client *client, uint32_t command, uint32_t tag, str
+ 	if ((o = find_device(client, id, name, sink)) == NULL)
+ 		return -ENOENT;
+ 
++	if (o->proxy == NULL)
++		return -ENOENT;
++
+ 	if (suspend) {
+ 		cmd = SPA_NODE_COMMAND_Suspend;
+ 		pw_node_send_command((struct pw_node*)o->proxy, &SPA_NODE_COMMAND_INIT(cmd));
+-- 
+2.26.3
+

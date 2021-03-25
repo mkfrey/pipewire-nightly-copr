@@ -1,0 +1,51 @@
+From c0897f2f2cb02d1f1f7893e84c1961313d60c0aa Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Sat, 20 Mar 2021 15:02:55 +0200
+Subject: [PATCH 04/10] pulse-server: don't send invalid port profile arrays
+
+libpulse assumes in introspect.c:fill_card_port_info that port profile
+array size <= card profile array size, and may crash otherwise.
+
+Enforce this in fill_card_info. It can happen, if EnumRoute and
+EnumProfile info is not in sync.
+---
+ src/modules/module-protocol-pulse/pulse-server.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/src/modules/module-protocol-pulse/pulse-server.c b/src/modules/module-protocol-pulse/pulse-server.c
+index cf15acce1..842abb16e 100644
+--- a/src/modules/module-protocol-pulse/pulse-server.c
++++ b/src/modules/module-protocol-pulse/pulse-server.c
+@@ -3933,7 +3933,7 @@ static int fill_card_info(struct client *client, struct message *m,
+ 		for (n = 0; n < n_ports; n++) {
+ 			struct spa_dict_item *items;
+ 			struct spa_dict *pdict = NULL, dict;
+-			uint32_t i;
++			uint32_t i, pi_n_profiles;
+ 
+ 			pi = &port_info[n];
+ 
+@@ -3952,11 +3952,18 @@ static int fill_card_info(struct client *client, struct message *m,
+ 				TAG_PROPLIST, pdict,			/* port proplist */
+ 				TAG_INVALID);
+ 
++			pi_n_profiles = SPA_MIN(pi->n_profiles, n_profiles);
++			if (pi->n_profiles != pi_n_profiles) {
++				/* libpulse assumes port profile array size <= n_profiles */
++				pw_log_error(NAME" %p: card %d port %d profiles inconsistent (%d < %d)",
++						client->impl, o->id, n, n_profiles, pi->n_profiles);
++			}
++
+ 			message_put(m,
+-				TAG_U32, pi->n_profiles,		/* n_profiles */
++				TAG_U32, pi_n_profiles,		/* n_profiles */
+ 				TAG_INVALID);
+ 
+-			for (i = 0; i < pi->n_profiles; i++) {
++			for (i = 0; i < pi_n_profiles; i++) {
+ 				uint32_t idx = pi->profiles[i];
+ 				message_put(m,
+ 					TAG_STRING, idx < n_profiles ?
+-- 
+2.26.3
+

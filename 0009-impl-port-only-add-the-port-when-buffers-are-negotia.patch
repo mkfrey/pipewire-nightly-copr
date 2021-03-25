@@ -1,0 +1,99 @@
+From f918e5e2c782b0dbc9d189ebe330a121c829193f Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 25 Mar 2021 11:30:58 +0100
+Subject: [PATCH 09/10] impl-port: only add the port when buffers are
+ negotiated
+
+To avoid crashes when the node is scheduled but buffer have been
+cleared.
+
+See #904
+---
+ src/pipewire/impl-port.c | 24 +++++++++++++++++++-----
+ src/pipewire/private.h   |  5 +++--
+ 2 files changed, 22 insertions(+), 7 deletions(-)
+
+diff --git a/src/pipewire/impl-port.c b/src/pipewire/impl-port.c
+index bd6074d7f..9b1a0455b 100644
+--- a/src/pipewire/impl-port.c
++++ b/src/pipewire/impl-port.c
+@@ -961,8 +961,6 @@ int pw_impl_port_add(struct pw_impl_port *port, struct pw_impl_node *node)
+ 	if (node->global)
+ 		pw_impl_port_register(port, NULL);
+ 
+-	pw_loop_invoke(node->data_loop, do_add_port, SPA_ID_INVALID, NULL, 0, false, port);
+-
+ 	if (port->state <= PW_IMPL_PORT_STATE_INIT)
+ 		pw_impl_port_update_state(port, PW_IMPL_PORT_STATE_CONFIGURE, 0, NULL);
+ 
+@@ -1001,10 +999,13 @@ static void pw_impl_port_remove(struct pw_impl_port *port)
+ 	if (node == NULL)
+ 		return;
+ 
+-	pw_log_debug(NAME" %p: remove", port);
++	pw_log_debug(NAME" %p: remove added:%d", port, port->added);
+ 
+-	pw_loop_invoke(port->node->data_loop, do_remove_port,
+-		       SPA_ID_INVALID, NULL, 0, true, port);
++	if (port->added) {
++		pw_loop_invoke(node->data_loop, do_remove_port,
++			       SPA_ID_INVALID, NULL, 0, true, port);
++		port->added = false;
++	}
+ 
+ 	if (SPA_FLAG_IS_SET(port->flags, PW_IMPL_PORT_FLAG_TO_REMOVE)) {
+ 		if ((res = spa_node_remove_port(node->node, port->direction, port->port_id)) < 0)
+@@ -1295,6 +1296,10 @@ int pw_impl_port_set_param(struct pw_impl_port *port, uint32_t id, uint32_t flag
+ 	if (id == SPA_PARAM_Format) {
+ 		pw_log_debug(NAME" %p: %d %p %d", port, port->state, param, res);
+ 
++		if (port->added) {
++			pw_loop_invoke(node->data_loop, do_remove_port, SPA_ID_INVALID, NULL, 0, true, port);
++			port->added = false;
++		}
+ 		/* setting the format always destroys the negotiated buffers */
+ 		pw_buffers_clear(&port->buffers);
+ 		pw_buffers_clear(&port->mix_buffers);
+@@ -1327,6 +1332,11 @@ static int negotiate_mixer_buffers(struct pw_impl_port *port, uint32_t flags,
+ 		pw_log_debug(NAME" %p: %d.%d negotiate %d buffers on node: %p",
+ 				port, port->direction, port->port_id, n_buffers, node->node);
+ 
++		if (port->added) {
++			pw_loop_invoke(node->data_loop, do_remove_port, SPA_ID_INVALID, NULL, 0, true, port);
++			port->added = false;
++		}
++
+ 		pw_buffers_clear(&port->mix_buffers);
+ 
+ 		if (n_buffers > 0) {
+@@ -1356,6 +1366,10 @@ static int negotiate_mixer_buffers(struct pw_impl_port *port, uint32_t flags,
+ 			     pw_direction_reverse(port->direction), 0,
+ 			     0, buffers, n_buffers);
+ 	}
++	if (!port->added && n_buffers > 0) {
++		pw_loop_invoke(node->data_loop, do_add_port, SPA_ID_INVALID, NULL, 0, false, port);
++		port->added = true;
++	}
+ 	return res;
+ }
+ 
+diff --git a/src/pipewire/private.h b/src/pipewire/private.h
+index 186de6fd1..e6b6788aa 100644
+--- a/src/pipewire/private.h
++++ b/src/pipewire/private.h
+@@ -786,9 +786,10 @@ struct pw_impl_port {
+ 		struct spa_list mix_list;
+ 		struct spa_list node_link;
+ 	} rt;					/**< data only accessed from the data thread */
++	unsigned int added:1;
+ 
+-        void *owner_data;		/**< extra owner data */
+-        void *user_data;                /**< extra user data */
++	void *owner_data;		/**< extra owner data */
++	void *user_data;                /**< extra user data */
+ };
+ 
+ struct pw_control_link {
+-- 
+2.26.3
+

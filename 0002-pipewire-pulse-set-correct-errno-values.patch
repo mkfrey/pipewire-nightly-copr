@@ -1,0 +1,80 @@
+From 503feaa3fa857982c5f1b3c8cfc224ea99cd17a5 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Fri, 19 Mar 2021 12:46:05 +0100
+Subject: [PATCH 02/10] pipewire-pulse: set correct errno values
+
+errno should be set to the positive errno value.
+
+This does not cause problems except for the pulse-server where the
+errno value is negated and returned as an error result.
+---
+ spa/plugins/alsa/alsa-pcm-device.c         | 2 +-
+ spa/plugins/bluez5/bluez5-device.c         | 4 ++--
+ spa/plugins/jack/jack-device.c             | 2 +-
+ src/modules/module-protocol-pulse/module.c | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/spa/plugins/alsa/alsa-pcm-device.c b/spa/plugins/alsa/alsa-pcm-device.c
+index 285a76f28..af30ed2da 100644
+--- a/spa/plugins/alsa/alsa-pcm-device.c
++++ b/spa/plugins/alsa/alsa-pcm-device.c
+@@ -355,7 +355,7 @@ static struct spa_pod *build_profile(struct impl *this, struct spa_pod_builder *
+ 		desc = "On";
+ 		break;
+ 	default:
+-		errno = -EINVAL;
++		errno = EINVAL;
+ 		return NULL;
+ 	}
+ 
+diff --git a/spa/plugins/bluez5/bluez5-device.c b/spa/plugins/bluez5/bluez5-device.c
+index 7a747f415..b8d8ae5a9 100644
+--- a/spa/plugins/bluez5/bluez5-device.c
++++ b/spa/plugins/bluez5/bluez5-device.c
+@@ -660,7 +660,7 @@ static struct spa_pod *build_profile(struct impl *this, struct spa_pod_builder *
+ 		break;
+ 	}
+ 	default:
+-		errno = -EINVAL;
++		errno = EINVAL;
+ 		return NULL;
+ 	}
+ 
+@@ -775,7 +775,7 @@ static struct spa_pod *build_route(struct impl *this, struct spa_pod_builder *b,
+ 		snprintf(name, sizeof(name), "%s-output", name_prefix);
+ 		break;
+ 	default:
+-		errno = -EINVAL;
++		errno = EINVAL;
+ 		return NULL;
+ 	}
+ 
+diff --git a/spa/plugins/jack/jack-device.c b/spa/plugins/jack/jack-device.c
+index 75d6522e8..3c56e0a20 100644
+--- a/spa/plugins/jack/jack-device.c
++++ b/spa/plugins/jack/jack-device.c
+@@ -244,7 +244,7 @@ static struct spa_pod *build_profile(struct impl *this, struct spa_pod_builder *
+ 		desc = "On";
+ 		break;
+ 	default:
+-		errno = -EINVAL;
++		errno = EINVAL;
+ 		return NULL;
+ 	}
+ 
+diff --git a/src/modules/module-protocol-pulse/module.c b/src/modules/module-protocol-pulse/module.c
+index 52a90fbe3..987f65ef7 100644
+--- a/src/modules/module-protocol-pulse/module.c
++++ b/src/modules/module-protocol-pulse/module.c
+@@ -176,7 +176,7 @@ static struct module *create_module(struct client *client, const char *name, con
+ 
+ 	info = find_module_info(name);
+ 	if (info == NULL) {
+-		errno = -ENOENT;
++		errno = ENOENT;
+ 		return NULL;
+ 	}
+ 	module = info->create(impl, args);
+-- 
+2.26.3
+

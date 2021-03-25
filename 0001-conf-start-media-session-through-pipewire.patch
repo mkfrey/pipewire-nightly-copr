@@ -1,7 +1,7 @@
-From daf929aa0a50b06218b3269bdde3282549ef70c4 Mon Sep 17 00:00:00 2001
+From cb5a1841e4fdad320e85021ef1c66e5cf52cfc5a Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Thu, 4 Mar 2021 15:38:16 +0100
-Subject: [PATCH] conf: start media-session through pipewire
+Subject: [PATCH 01/10] conf: start media-session through pipewire
 
 ---
  src/daemon/pipewire.conf.in | 2 +-
@@ -21,5 +21,5 @@ index 281671c7c..af89fdc05 100644
      # You can optionally start the pulseaudio-server here as well
      # but it is better to start it as a systemd service.
 -- 
-2.26.2
+2.26.3
 
