@@ -225,6 +225,7 @@ This package provides a PulseAudio implementation based on PipeWire
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
+rm %{buildroot}%{_sysconfdir}/pipewire/jack.conf
 rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
 %endif
 
@@ -241,7 +242,8 @@ touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm -rf %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_sysconfdir}/pipewire/pipewire-pulse.conf
 %endif
 
 %find_lang %{name}
