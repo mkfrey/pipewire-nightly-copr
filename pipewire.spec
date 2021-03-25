@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -335,11 +335,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
-%config(noreplace) %{_sysconfdir}/pipewire/client.conf
-%config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
-%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
@@ -368,6 +364,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %if %{with vulkan}
 %{_libdir}/spa-%{spaversion}/vulkan/
 %endif
+%config(noreplace) %{_sysconfdir}/pipewire/client.conf
+%config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
@@ -429,6 +427,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
+%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
@@ -441,9 +440,13 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
+%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
 %endif
 
 %changelog
+* Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-2
+- Move individual config files to the subpackages that make use of them
+
 * Thu Mar 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-1
 - Update to 0.3.24
 
