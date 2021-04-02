@@ -246,7 +246,6 @@ This package provides a PulseAudio implementation based on PipeWire
     -D sdl2=enabled                                                     \
     -D sndfile=enabled                                                  \
     -D bluez5-codec-aptx=disabled                                       \
-    -D bluez5-codec-aac=disabled                                        \
     -D bluez5-codec-ldac=enabled                                        \
     %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled}           \
     %{!?with_alsa:-D pipewire-alsa=disabled}                            \
