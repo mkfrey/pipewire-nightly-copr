@@ -234,18 +234,22 @@ This package provides a PulseAudio implementation based on PipeWire
 
 %build
 %meson \
-    -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled 		\
-    -D audiotestsrc=disabled \
-    -D videotestsrc=disabled \
-    -D volume=disabled \
-    -D libcamera=disabled \
-    -D gstreamer-device-provider=disabled					\
-    -D sdl2=enabled -D sndfile=enabled          \
-    -D bluez5-codec-aptx=disabled  \
-    -D bluez5-codec-aac=disabled  \
-    -D bluez5-codec-ldac=enabled  \
-    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 		\
-    %{!?with_alsa:-D pipewire-alsa=disabled}				\
+    -D docs=enabled                                                     \
+    -D man=enabled                                                      \
+    -D gstreamer=enabled                                                \
+    -D systemd=enabled                                                  \
+    -D audiotestsrc=disabled                                            \
+    -D videotestsrc=disabled                                            \
+    -D volume=disabled                                                  \
+    -D libcamera=disabled                                               \
+    -D gstreamer-device-provider=disabled                               \
+    -D sdl2=enabled                                                     \
+    -D sndfile=enabled                                                  \
+    -D bluez5-codec-aptx=disabled                                       \
+    -D bluez5-codec-aac=disabled                                        \
+    -D bluez5-codec-ldac=enabled                                        \
+    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled}           \
+    %{!?with_alsa:-D pipewire-alsa=disabled}                            \
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
