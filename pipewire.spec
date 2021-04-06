@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 24
+%global microversion 25
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 4
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,15 +57,6 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/p
 
 ## fedora patches
 Patch0:    0001-conf-start-media-session-through-pipewire.patch
-Patch1:    0002-pipewire-pulse-set-correct-errno-values.patch
-Patch2:    0003-media-session-check-stream-move-after-configuring-a-.patch
-Patch3:    0004-pulse-server-don-t-send-invalid-port-profile-arrays.patch
-Patch4:    0005-pulse-server-fix-route-profile-numbering.patch
-Patch5:    0006-impl-node-first-start-the-node-then-make-it-schedula.patch
-Patch6:    0007-alsa-never-queue-buffers-when-rate-matching.patch
-Patch7:    0008-pulse-server-handle-NULL-proxy.patch
-Patch8:    0009-impl-port-only-add-the-port-when-buffers-are-negotia.patch
-Patch9:    0010-pulse-server-avoid-returning-NULL-strings.patch
 
 
 BuildRequires:  gettext
@@ -179,7 +170,6 @@ Summary:        PipeWire JACK implementation
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libjack%{?_isa} = %{version}-%{release}
-BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
 Conflicts:      jack-audio-connection-kit
 Conflicts:      jack-audio-connection-kit-dbus
 # Fixed jack subpackages
@@ -402,6 +392,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
 %{_bindir}/pw-dump
+%{_bindir}/pw-loopback
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
@@ -456,6 +447,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Apr 06 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.25-1
+- Update to 0.3.25
+
 * Thu Mar 25 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-4
 - Apply some critical upstream patches
 
