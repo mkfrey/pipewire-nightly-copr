@@ -392,6 +392,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-reserve
 %{_bindir}/pw-top
 %{_bindir}/pw-loopback
+%{_bindir}/pw-link
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
