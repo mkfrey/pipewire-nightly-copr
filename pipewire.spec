@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -27,14 +27,9 @@
 # Features disabled for RHEL 8
 %if 0%{?rhel} && 0%{?rhel} < 9
 %bcond_with pulse
-%else
-%bcond_without pulse
-%endif
-
-# Features disabled for RHEL
-%if 0%{?rhel}
 %bcond_with jack
 %else
+%bcond_without pulse
 %bcond_without jack
 %endif
 
@@ -48,15 +43,20 @@ URL:            https://pipewire.org/
 %if 0%{?snapdate}
 Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{gitcommit}/pipewire-%{shortcommit}.tar.gz
 %else
-Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
+Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
 %endif
 
 ## upstream patches
+## Install jack headers and pkgconfig file to substitute JACK entirely
+Patch0001:      0001-Add-feature-option-for-installing-jack-development-f.patch
+Patch0002:      0002-Install-jack-headers.patch
+Patch0003:      0003-Generate-JACK-pkgconfig-file.patch
+Patch0004:      0004-Add-server_libs-variable-to-jack-pkgconf-file.patch
 
 ## upstreamable patches
 
 ## fedora patches
-Patch0:    0001-conf-start-media-session-through-pipewire.patch
+Patch1001:      0001-conf-start-media-session-through-pipewire.patch
 
 
 BuildRequires:  gettext
@@ -190,6 +190,17 @@ Obsoletes:      jack-audio-connection-kit < 1.9.16-2
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
 
+%package jack-audio-connection-kit-devel
+Summary:        Development files for %{name}-jack-audio-connection-kit
+License:        MIT
+Requires:       %{name}-jack-audio-connection-kit%{?_isa} = %{version}-%{release}
+Conflicts:      jack-audio-connection-kit-devel
+Enhances:       %{name}-jack-audio-connection-kit
+
+%description jack-audio-connection-kit-devel
+This package provides development files for building JACK applications
+using PipeWire's JACK library.
+
 %package plugin-jack
 Summary:        PipeWire media server JACK support
 License:        MIT
@@ -253,6 +264,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D bluez5-codec-ldac=disabled						\
 %endif
     %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 			\
+    %{?with_jack:-D jack-devel=enabled} 					\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
@@ -427,12 +439,19 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files jack-audio-connection-kit
 %{_bindir}/pw-jack
 %{_mandir}/man1/pw-jack.1*
-%{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
-%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
-%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.*
 %config(noreplace) %{_sysconfdir}/pipewire/jack.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
+
+%files jack-audio-connection-kit-devel
+%{_includedir}/jack/
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so
+%{_libdir}/pkgconfig/jack.pc
 
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
@@ -447,6 +466,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Apr 20 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.25-2
+- Add jack-devel subpackage, enable JACK support on RHEL 9+ (#1945951)
+
 * Tue Apr 06 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.25-1
 - Update to 0.3.25
 

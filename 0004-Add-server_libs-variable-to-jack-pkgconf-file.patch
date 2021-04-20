@@ -1,0 +1,49 @@
+From b48d1facf4e77a37a84713ba02d140a792cebc8e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Nils=20Tonn=C3=A4tt?= <nils.tonnaett@posteo.de>
+Date: Sun, 18 Apr 2021 18:14:34 +0200
+Subject: [PATCH 4/4] Add server_libs variable to jack pkgconf file
+
+---
+ pipewire-jack/src/meson.build | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/pipewire-jack/src/meson.build b/pipewire-jack/src/meson.build
+index 32d37c48..83e340ba 100644
+--- a/pipewire-jack/src/meson.build
++++ b/pipewire-jack/src/meson.build
+@@ -47,15 +47,6 @@ pipewire_jack = shared_library('jack',
+     install_dir : libjack_path,
+ )
+ 
+-if get_option('jack-devel').enabled()
+-  pkgconfig.generate(filebase : 'jack',
+-  libraries : pipewire_jack,
+-  name : 'jack',
+-  description : 'PipeWire JACK API',
+-  version : '1.9.17',
+-  extra_cflags : '-D_REENTRANT')
+-endif
+-
+ pipewire_jackserver = shared_library('jackserver',
+     pipewire_jackserver_sources,
+     soversion : soversion,
+@@ -78,6 +69,16 @@ pipewire_jackserver = shared_library('jacknet',
+     install_dir : libjack_path,
+ )
+ 
++if get_option('jack-devel').enabled()
++  pkgconfig.generate(filebase : 'jack',
++  libraries : [pipewire_jack, pipewire_jackserver],
++  name : 'jack',
++  description : 'PipeWire JACK API',
++  version : '1.9.17',
++  extra_cflags : '-D_REENTRANT',
++  variables: ['server_libs=-L${libdir} -ljackserver'])
++endif
++
+ if sdl_dep.found()
+   executable('video-dsp-play',
+     '../examples/video-dsp-play.c',
+-- 
+2.31.1
+
