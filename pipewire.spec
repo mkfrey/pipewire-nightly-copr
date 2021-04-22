@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 25
+%global microversion 26
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -47,11 +47,6 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
-## Install jack headers and pkgconfig file to substitute JACK entirely
-Patch0001:      0001-Add-feature-option-for-installing-jack-development-f.patch
-Patch0002:      0002-Install-jack-headers.patch
-Patch0003:      0003-Generate-JACK-pkgconfig-file.patch
-Patch0004:      0004-Add-server_libs-variable-to-jack-pkgconf-file.patch
 
 ## upstreamable patches
 
@@ -404,6 +399,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
 %{_bindir}/pw-dump
+%{_bindir}/pw-link
 %{_bindir}/pw-loopback
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
@@ -466,6 +462,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Apr 22 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-1
+- Update to 0.3.26
+
 * Tue Apr 20 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.25-2
 - Add jack-devel subpackage, enable JACK support on RHEL 9+ (#1945951)
 
