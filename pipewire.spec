@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -33,6 +33,12 @@
 %bcond_without jack
 %endif
 
+# Features disabled for RHEL
+%if 0%{?rhel}
+%bcond_with jackserver_plugin
+%else
+%bcond_without jackserver_plugin
+%endif
 
 Name:           pipewire
 Summary:        Media Sharing Server
@@ -195,7 +201,9 @@ Enhances:       %{name}-jack-audio-connection-kit
 %description jack-audio-connection-kit-devel
 This package provides development files for building JACK applications
 using PipeWire's JACK library.
+%endif
 
+%if %{with jackserver_plugin}
 %package plugin-jack
 Summary:        PipeWire media server JACK support
 License:        MIT
@@ -258,7 +266,8 @@ This package provides a PulseAudio implementation based on PipeWire
 %ifarch s390x
     -D bluez5-codec-ldac=disabled						\
 %endif
-    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled} 			\
+    %{!?with_jack:-D pipewire-jack=disabled} 					\
+    %{!?with_jackserver_plugin:-D jack=disabled} 				\
     %{?with_jack:-D jack-devel=enabled} 					\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
@@ -448,7 +457,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so
 %{_libdir}/pkgconfig/jack.pc
+%endif
 
+%if %{with jackserver_plugin}
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
 %endif
@@ -462,6 +473,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Sat Apr 24 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.26-2
+- Disable JACK server integration on RHEL
+
 * Thu Apr 22 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-1
 - Update to 0.3.26
 
