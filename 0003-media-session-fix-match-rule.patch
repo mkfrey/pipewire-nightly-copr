@@ -1,0 +1,30 @@
+From 87b30e280e1e36cecd57422d9c619293feef2307 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Sun, 25 Apr 2021 13:47:23 +0200
+Subject: [PATCH 3/6] media-session: fix match rule
+
+When matching without regex, don't just to a startswith check but also
+check that the sizes of the strings match.
+
+Fixes #1098
+---
+ src/examples/media-session/match-rules.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/examples/media-session/match-rules.c b/src/examples/media-session/match-rules.c
+index 84dca414..7e2ab701 100644
+--- a/src/examples/media-session/match-rules.c
++++ b/src/examples/media-session/match-rules.c
+@@ -72,7 +72,8 @@ static bool find_match(struct spa_json *arr, struct pw_properties *props)
+ 							success = true;
+ 						regfree(&preg);
+ 					}
+-				} else if (strncmp(str, value, len) == 0) {
++				} else if (strncmp(str, value, len) == 0 &&
++				    strlen(str) == (size_t)len) {
+ 					success = true;
+ 				}
+ 			}
+-- 
+2.30.2
+

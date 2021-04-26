@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 3
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -53,12 +53,16 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
+Patch0001:      0002-acp-sync-with-pulseaudio.patch
+Patch0002:      0003-media-session-fix-match-rule.patch
+Patch0003:      0004-media-session-keep-track-of-seq-in-pw_-_enum_params.patch
+Patch0004:      0005-pulse-server-keep-track-of-seq-in-pw_-_enum_params.patch
+Patch0005:      0006-bluez5-don-t-unregister-HFP-HSP-profiles-when-shutti.patch
 
 ## upstreamable patches
 
 ## fedora patches
 Patch1001:      0001-conf-start-media-session-through-pipewire.patch
-
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -473,6 +477,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Apr 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-3
+- Add some important upstream patches.
+
 * Sat Apr 24 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.26-2
 - Disable JACK server integration on RHEL
 
