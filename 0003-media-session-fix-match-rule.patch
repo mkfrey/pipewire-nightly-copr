@@ -1,7 +1,7 @@
 From 87b30e280e1e36cecd57422d9c619293feef2307 Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Sun, 25 Apr 2021 13:47:23 +0200
-Subject: [PATCH 3/6] media-session: fix match rule
+Subject: [PATCH 03/10] media-session: fix match rule
 
 When matching without regex, don't just to a startswith check but also
 check that the sizes of the strings match.

@@ -1,7 +1,7 @@
 From cd4a47666d537fce00e736dde5a0170f93260f10 Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Thu, 22 Apr 2021 12:25:48 +0200
-Subject: [PATCH 2/6] acp: sync with pulseaudio
+Subject: [PATCH 02/10] acp: sync with pulseaudio
 
 Remove our custom hack to work around missing duplex and use
 upstream fix.

@@ -1,7 +1,7 @@
 From f6cbb05aa95f0580bded97c194d928296cc0e874 Mon Sep 17 00:00:00 2001
 From: Pauli Virtanen <pav@iki.fi>
 Date: Sun, 25 Apr 2021 20:42:03 +0300
-Subject: [PATCH 5/6] pulse-server: keep track of seq in pw_*_enum_params
+Subject: [PATCH 05/10] pulse-server: keep track of seq in pw_*_enum_params
 
 If multiple async enum param are running at the same time, take results
 only from the latest one.

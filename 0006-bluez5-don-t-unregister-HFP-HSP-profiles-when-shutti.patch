@@ -1,7 +1,7 @@
 From b6d6800fc39538db50753df35d117b7b6a8c3311 Mon Sep 17 00:00:00 2001
 From: Pauli Virtanen <pav@iki.fi>
 Date: Sun, 25 Apr 2021 21:18:45 +0300
-Subject: [PATCH 6/6] bluez5: don't unregister HFP/HSP profiles when shutting
+Subject: [PATCH 06/10] bluez5: don't unregister HFP/HSP profiles when shutting
  down
 
 This apparently causes delays in shutdown under some conditions, and

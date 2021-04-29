@@ -1,7 +1,7 @@
 From a193bf7e1faa03d1907ebecac097f9ccc3420310 Mon Sep 17 00:00:00 2001
 From: Pauli Virtanen <pav@iki.fi>
 Date: Sun, 25 Apr 2021 19:11:43 +0300
-Subject: [PATCH 4/6] media-session: keep track of seq in pw_*_enum_params
+Subject: [PATCH 04/10] media-session: keep track of seq in pw_*_enum_params
 
 If multiple async enum param are running at the same time, take results
 only from the latest one.
