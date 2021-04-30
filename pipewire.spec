@@ -47,6 +47,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipew
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
