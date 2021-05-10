@@ -1,0 +1,63 @@
+From efa27558b9dcda3a8d77121beae8b264f8204967 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Mon, 10 May 2021 10:50:42 +0200
+Subject: [PATCH 2/2] acp: reset soft_volume
+
+Reset the software volume when initializing the device and when the
+hardware volume is updated.
+
+The software volume was set to 0 by default and if the session manager
+did not change the volume enough to cause a software volume change,
+it would remain 0 and there would be silence.
+
+Also improve the debug a little.
+
+See #1160 #1167 #1164 #1049 #1117
+---
+ spa/plugins/alsa/acp/acp.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/spa/plugins/alsa/acp/acp.c b/spa/plugins/alsa/acp/acp.c
+index 0dab74d3..1b15bd44 100644
+--- a/spa/plugins/alsa/acp/acp.c
++++ b/spa/plugins/alsa/acp/acp.c
+@@ -215,6 +215,7 @@ static void init_device(pa_card *impl, pa_alsa_device *dev, pa_alsa_direction_t
+ 	dev->device.format.rate_mask = m->sample_spec.rate;
+ 	dev->device.format.channels = m->channel_map.channels;
+ 	pa_cvolume_reset(&dev->real_volume, m->channel_map.channels);
++	pa_cvolume_reset(&dev->soft_volume, m->channel_map.channels);
+ 	for (i = 0; i < m->channel_map.channels; i++)
+ 		dev->device.format.map[i]= channel_pa2acp(m->channel_map.map[i]);
+ 	dev->direction = direction;
+@@ -1033,10 +1034,15 @@ static int read_volume(pa_alsa_device *dev)
+ 		return 0;
+ 
+ 	dev->real_volume = r;
+-	pa_log_info("New hardware volume:");
++
++	pa_log_info("New hardware volume: min:%d max:%d",
++			pa_cvolume_min(&r), pa_cvolume_max(&r));
++
+ 	for (i = 0; i < r.channels; i++)
+ 		pa_log_debug("  %d: %d", i, r.values[i]);
+ 
++	pa_cvolume_reset(&dev->soft_volume, r.channels);
++
+ 	if (impl->events && impl->events->volume_changed)
+ 		impl->events->volume_changed(impl->user_data, &dev->device);
+ 
+@@ -1803,7 +1809,10 @@ int acp_device_set_volume(struct acp_device *dev, const float *volume, uint32_t
+ 	for (i = 0; i < v.channels; i++)
+ 		v.values[i] = pa_sw_volume_from_linear(volume[i % n_volume]);;
+ 
+-	pa_log_info("Set %s volume: %d", d->set_volume ? "hardware" : "software", pa_cvolume_max(&v));
++	pa_log_info("Set %s volume: min:%d max:%d",
++			d->set_volume ? "hardware" : "software",
++			pa_cvolume_min(&v), pa_cvolume_max(&v));
++
+ 	for (i = 0; i < v.channels; i++)
+ 		pa_log_debug("  %d: %d", i, v.values[i]);
+ 
+-- 
+2.31.1
+
