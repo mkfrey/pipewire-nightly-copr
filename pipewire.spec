@@ -342,6 +342,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/pipewire/filter-chain/demonic.conf
 %config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-eq6.conf
 %config(noreplace) %{_sysconfdir}/pipewire/filter-chain/source-rnnoise.conf
+%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-dolby-surround.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs -f %{name}.lang
