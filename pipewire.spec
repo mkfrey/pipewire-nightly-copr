@@ -79,6 +79,7 @@ BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  SDL2-devel
 BuildRequires:  libldac-devel
+BuildRequires:  pulseaudio-libs-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -332,11 +333,15 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_mandir}/man1/pipewire.1*
 %dir %{_sysconfdir}/pipewire/
 %dir %{_sysconfdir}/pipewire/media-session.d/
+%dir %{_sysconfdir}/pipewire/filter-chain/
 %config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
 %config(noreplace) %{_sysconfdir}/pipewire/media-session.d/v4l2-monitor.conf
+%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/demonic.conf
+%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-eq6.conf
+%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/source-rnnoise.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs -f %{name}.lang
