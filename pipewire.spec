@@ -80,6 +80,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  SDL2-devel
 BuildRequires:  libldac-devel
 BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  avahi-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
