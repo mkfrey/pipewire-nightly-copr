@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 27
+%global microversion 28
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -53,7 +53,6 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
-Patch0001:      0002-acp-reset-soft_volume.patch
 
 ## upstreamable patches
 
@@ -93,6 +92,8 @@ BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
+BuildRequires:  pulseaudio-libs-devel
+BuildRequires:  avahi-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -281,8 +282,8 @@ This package provides a PulseAudio implementation based on PipeWire
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
-rm %{buildroot}%{_sysconfdir}/pipewire/jack.conf
-rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
+rm %{buildroot}%{_datadir}/pipewire/jack.conf
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-jack
 %endif
 
 %if %{with alsa}
@@ -291,15 +292,15 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
+touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if ! %{with pulse}
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
-rm %{buildroot}%{_sysconfdir}/pipewire/pipewire-pulse.conf
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 # We don't start the media session with systemd yet
@@ -352,13 +353,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
-%dir %{_sysconfdir}/pipewire/
-%dir %{_sysconfdir}/pipewire/media-session.d/
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/v4l2-monitor.conf
+%dir %{_datadir}/pipewire/
+%dir %{_datadir}/pipewire/media-session.d/
+%{_datadir}/pipewire/pipewire.conf
+%{_datadir}/pipewire/media-session.d/alsa-monitor.conf
+%{_datadir}/pipewire/media-session.d/bluez-monitor.conf
+%{_datadir}/pipewire/media-session.d/media-session.conf
+%{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
+%{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs -f %{name}.lang
@@ -383,8 +385,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %if %{with vulkan}
 %{_libdir}/spa-%{spaversion}/vulkan/
 %endif
-%config(noreplace) %{_sysconfdir}/pipewire/client.conf
-%config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
+%{_datadir}/pipewire/client.conf
+%{_datadir}/pipewire/client-rt.conf
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
@@ -438,7 +440,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-alsa
+%{_datadir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if %{with jack}
@@ -448,8 +450,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so.*
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.*
-%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
+%{_datadir}/pipewire/jack.conf
+%{_datadir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
 %files jack-audio-connection-kit-devel
@@ -469,11 +471,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
+%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 %changelog
+* Mon May 17 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.28-1
+- Update to 0.3.28
+
 * Mon May 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.27-2
 - Add patch to fix volume issues.
 
