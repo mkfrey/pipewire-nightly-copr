@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 27
+%global microversion 28
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -20,15 +20,17 @@
 # Features disabled for RHEL 8
 %if 0%{?rhel} && 0%{?rhel} < 9
 %bcond_with pulse
+%bcond_with jack
 %else
 %bcond_without pulse
+%bcond_without jack
 %endif
 
 # Features disabled for RHEL
 %if 0%{?rhel}
-%bcond_with jack
+%bcond_with jackserver_plugin
 %else
-%bcond_without jack
+%bcond_without jackserver_plugin
 %endif
 
 
@@ -182,6 +184,19 @@ Obsoletes:      jack-audio-connection-kit < 1.9.16-2
 %description jack-audio-connection-kit
 This package provides a JACK implementation based on PipeWire
 
+%package jack-audio-connection-kit-devel
+Summary:        Development files for %{name}-jack-audio-connection-kit
+License:        MIT
+Requires:       %{name}-jack-audio-connection-kit%{?_isa} = %{version}-%{release}
+Conflicts:      jack-audio-connection-kit-devel
+Enhances:       %{name}-jack-audio-connection-kit
+ 
+%description jack-audio-connection-kit-devel
+This package provides development files for building JACK applications
+using PipeWire's JACK library.
+%endif
+
+%if %{with jackserver_plugin}
 %package plugin-jack
 Summary:        PipeWire media server JACK support
 License:        MIT
@@ -251,6 +266,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D bluez5-codec-aptx=disabled                                       \
     -D bluez5-codec-ldac=enabled                                        \
     %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled}           \
+    %{?with_jack:-D jack-devel=enabled}                                 \
     %{!?with_alsa:-D pipewire-alsa=disabled}                            \
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
@@ -262,8 +278,8 @@ This package provides a PulseAudio implementation based on PipeWire
 mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
-rm %{buildroot}%{_sysconfdir}/pipewire/jack.conf
-rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-jack
+rm %{buildroot}%{_datadir}/pipewire/jack.conf
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-jack
 %endif
 
 %if %{with alsa}
@@ -272,15 +288,15 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-touch %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-alsa
+touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if ! %{with pulse}
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm %{buildroot}%{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
-rm %{buildroot}%{_sysconfdir}/pipewire/pipewire-pulse.conf
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
+rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 %find_lang %{name}
@@ -332,19 +348,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire
 %{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
-%dir %{_sysconfdir}/pipewire/
-%dir %{_sysconfdir}/pipewire/media-session.d/
-%dir %{_sysconfdir}/pipewire/filter-chain/
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/alsa-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/bluez-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/media-session.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/v4l2-monitor.conf
-%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/demonic.conf
-%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-eq6.conf
-%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/source-rnnoise.conf
-%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-dolby-surround.conf
-%config(noreplace) %{_sysconfdir}/pipewire/filter-chain/sink-matrix-spatialiser.conf
+%dir %{_datadir}/pipewire/
+%dir %{_datadir}/pipewire/media-session.d/
+%{_datadir}/pipewire/pipewire.conf
+%{_datadir}/pipewire/media-session.d/alsa-monitor.conf
+%{_datadir}/pipewire/media-session.d/bluez-monitor.conf
+%{_datadir}/pipewire/media-session.d/media-session.conf
+%{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
+%{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
 
 %files libs -f %{name}.lang
@@ -369,8 +380,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %if %{with vulkan}
 %{_libdir}/spa-%{spaversion}/vulkan/
 %endif
-%config(noreplace) %{_sysconfdir}/pipewire/client.conf
-%config(noreplace) %{_sysconfdir}/pipewire/client-rt.conf
+%{_datadir}/pipewire/client.conf
+%{_datadir}/pipewire/client-rt.conf
 
 %files gstreamer
 %{_libdir}/gstreamer-1.0/libgstpipewire.*
@@ -424,20 +435,30 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-alsa
+%{_datadir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if %{with jack}
 %files jack-audio-connection-kit
 %{_bindir}/pw-jack
 %{_mandir}/man1/pw-jack.1*
-%{_libdir}/pipewire-%{apiversion}/jack/libjack.so*
-%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so*
-%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so*
-%config(noreplace) %{_sysconfdir}/pipewire/jack.conf
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-jack
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.*
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.*
+%{_datadir}/pipewire/jack.conf
+%{_datadir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
+	
+%files jack-audio-connection-kit-devel
+%{_includedir}/jack/
+%{_libdir}/pipewire-%{apiversion}/jack/libjack.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so
+%{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so
+%{_libdir}/pkgconfig/jack.pc
+%endif
+
+%if %{with jackserver_plugin}
 %files plugin-jack
 %{_libdir}/spa-%{spaversion}/jack/
 %endif
@@ -446,8 +467,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
+%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 %changelog
