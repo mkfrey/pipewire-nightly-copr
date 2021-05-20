@@ -467,8 +467,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
-%config(noreplace) %{_sysconfdir}/pipewire/media-session.d/with-pulseaudio
-%config(noreplace) %{_sysconfdir}/pipewire/pipewire-pulse.conf
+%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 %changelog
