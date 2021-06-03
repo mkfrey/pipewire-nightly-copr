@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 28
+%global microversion 29
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -94,6 +94,7 @@ BuildRequires:  libsndfile-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
+BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -476,6 +477,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jun 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-1
+- Update to 0.3.29
+
 * Mon May 17 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.28-1
 - Update to 0.3.28
 
