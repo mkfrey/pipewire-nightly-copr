@@ -33,7 +33,6 @@
 %bcond_without jackserver_plugin
 %endif
 
-
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}+nightly
@@ -49,7 +48,7 @@ Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipew
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
 BuildRequires:  gcc
-BuildRequires:  gcc-c++
+BuildRequires:  g++
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
@@ -83,6 +82,7 @@ BuildRequires:  SDL2-devel
 BuildRequires:  libldac-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
+BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -163,7 +163,6 @@ Summary:        PipeWire JACK implementation
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libjack%{?_isa} = %{version}-%{release}
-BuildRequires:  jack-audio-connection-kit-devel >= 1.9.10
 Conflicts:      jack-audio-connection-kit
 Conflicts:      jack-audio-connection-kit-dbus
 # Fixed jack subpackages
@@ -190,7 +189,7 @@ License:        MIT
 Requires:       %{name}-jack-audio-connection-kit%{?_isa} = %{version}-%{release}
 Conflicts:      jack-audio-connection-kit-devel
 Enhances:       %{name}-jack-audio-connection-kit
- 
+
 %description jack-audio-connection-kit-devel
 This package provides development files for building JACK applications
 using PipeWire's JACK library.
@@ -265,9 +264,10 @@ This package provides a PulseAudio implementation based on PipeWire
     -D sndfile=enabled                                                  \
     -D bluez5-codec-aptx=disabled                                       \
     -D bluez5-codec-ldac=enabled                                        \
-    %{!?with_jack:-D jack=disabled -D pipewire-jack=disabled}           \
-    %{?with_jack:-D jack-devel=enabled}                                 \
-    %{!?with_alsa:-D pipewire-alsa=disabled}                            \
+    %{!?with_jack:-D pipewire-jack=disabled} 					\
+    %{!?with_jackserver_plugin:-D jack=disabled} 				\
+    %{?with_jack:-D jack-devel=enabled} 					\
+    %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
@@ -298,6 +298,9 @@ rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
 rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
+
+# We don't start the media session with systemd yet
+rm %{buildroot}%{_userunitdir}/pipewire-media-session.*
 
 %find_lang %{name}
 
@@ -406,13 +409,13 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
 %{_bindir}/pw-dump
+%{_bindir}/pw-link
+%{_bindir}/pw-loopback
 %{_bindir}/pw-play
 %{_bindir}/pw-profiler
 %{_bindir}/pw-record
 %{_bindir}/pw-reserve
 %{_bindir}/pw-top
-%{_bindir}/pw-loopback
-%{_bindir}/pw-link
 %{_mandir}/man1/pw-mon.1*
 %{_mandir}/man1/pw-cli.1*
 %{_mandir}/man1/pw-cat.1*
@@ -423,9 +426,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %{_bindir}/spa-acp-tool
 %{_bindir}/spa-inspect
+%{_bindir}/spa-json-dump
 %{_bindir}/spa-monitor
 %{_bindir}/spa-resample
-%{_bindir}/spa-json-dump
 
 %if %{with alsa}
 %files alsa
@@ -449,7 +452,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
-	
 %files jack-audio-connection-kit-devel
 %{_includedir}/jack/
 %{_libdir}/pipewire-%{apiversion}/jack/libjack.so
@@ -472,6 +474,80 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Jun 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-2
+- Add some important patches.
+
+* Thu Jun 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-1
+- Update to 0.3.29
+
+* Mon May 17 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.28-1
+- Update to 0.3.28
+
+* Mon May 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.27-2
+- Add patch to fix volume issues.
+
+* Thu May 06 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.27-1
+- Update to 0.3.27
+
+* Thu Apr 29 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-4
+- Add some more important upstream patches.
+
+* Mon Apr 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-3
+- Add some important upstream patches.
+
+* Sat Apr 24 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.26-2
+- Disable JACK server integration on RHEL
+
+* Thu Apr 22 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.26-1
+- Update to 0.3.26
+
+* Tue Apr 20 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.25-2
+- Add jack-devel subpackage, enable JACK support on RHEL 9+ (#1945951)
+
+* Tue Apr 06 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.25-1
+- Update to 0.3.25
+
+* Thu Mar 25 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-4
+- Apply some critical upstream patches
+
+* Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-3
+- Fix RHEL build
+
+* Thu Mar 25 2021 Kalev Lember <klember@redhat.com> - 0.3.24-2
+- Move individual config files to the subpackages that make use of them
+
+* Thu Mar 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.24-1
+- Update to 0.3.24
+
+* Tue Mar 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.23-2
+- Add patch to enable UCM Microphones
+
+* Thu Mar 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.23-1
+- Update to 0.3.23
+
+* Wed Feb 24 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-7
+- Add patch to sample destroy use after free
+
+* Wed Feb 24 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-6
+- Add patch for jack names
+
+* Mon Feb 22 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-5
+- Add some critical patches
+
+* Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-4
+- Replace more PulseAudio modules on upgrade in F34+
+
+* Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-3
+- Replace ALSA plugins and PulseAudio modules on upgrade in F34+
+
+* Fri Feb 19 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.22-2
+- Replace JACK and PulseAudio on upgrade in F34+
+  Reference: https://fedoraproject.org/wiki/Changes/DefaultPipeWire
+
+* Thu Feb 18 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.22-1
+- Update to 0.3.22
+- disable sdl2 examples
+
 * Thu Feb 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.21-2
 - Add some upstream patches
 - Fixes rhbz#1925138
