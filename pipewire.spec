@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -53,6 +53,10 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
+Patch0001:      0002-pulse-server-suffix-TAG_USEC-constants-with-LL-as-th.patch
+Patch0002:      0003-Revert-media-session-use-direction-to-find-the-node-.patch
+Patch0003:      0004-pulse-server-module-combine-sink-remove-hooks.patch
+Patch0004:      0005-pulse-server-avoid-overflow.patch
 
 ## upstreamable patches
 
@@ -477,6 +481,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Fri Jun 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-2
+- Add some important patches.
+
 * Thu Jun 03 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-1
 - Update to 0.3.29
 
