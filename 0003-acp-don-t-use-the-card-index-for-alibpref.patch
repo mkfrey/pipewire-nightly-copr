@@ -1,0 +1,28 @@
+From fe703d8c2b6ea0e198f5f509a5c6f4700df88edc Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 10 Jun 2021 13:21:08 +0200
+Subject: [PATCH 3/5] acp: don't use the card index for alibpref
+
+The alibpref fallback does not contain the card number but it is
+a local counter instead. Just check if it starts with something in
+case the alsa library is not patched to return _alibpref.
+---
+ spa/plugins/alsa/acp/acp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spa/plugins/alsa/acp/acp.c b/spa/plugins/alsa/acp/acp.c
+index 0d773ef8a..f95440737 100644
+--- a/spa/plugins/alsa/acp/acp.c
++++ b/spa/plugins/alsa/acp/acp.c
+@@ -247,7 +247,7 @@ static void init_device(pa_card *impl, pa_alsa_device *dev, pa_alsa_direction_t
+ 		if ((snd_use_case_get(impl->ucm.ucm_mgr, "_alibpref", &alibpref) != 0))
+ 			alibpref = NULL;
+ 		if (alibpref == NULL)
+-			alibpref = spa_aprintf("_ucm%04X.", impl->card.index);
++			alibpref = strdup("_ucm");
+ 		if (alibpref != NULL) {
+ 			char **d;
+ 			for (d = m->device_strings; *d; d++) {
+-- 
+2.31.1
+

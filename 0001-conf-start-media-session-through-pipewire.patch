@@ -1,4 +1,4 @@
-From af1bb3f6bfa29f8eb018350a60275041aded7157 Mon Sep 17 00:00:00 2001
+From 553e084ea0a3cbe34f6cb14db942cc9184782c6c Mon Sep 17 00:00:00 2001
 From: Wim Taymans <wtaymans@redhat.com>
 Date: Thu, 4 Mar 2021 15:38:16 +0100
 Subject: [PATCH 1/5] conf: start media-session through pipewire

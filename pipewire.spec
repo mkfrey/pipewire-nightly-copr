@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -53,6 +53,10 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
+Patch0001:      0002-alsa-open-UCM-only-once.patch
+Patch0002:      0003-acp-don-t-use-the-card-index-for-alibpref.patch
+Patch0003:      0004-alsa-use-the-local-alibpref-of-the-card.patch
+Patch0004:      0005-alsa-strip-and-add-the-_alibpref-from-device-names.patch
 
 ## upstreamable patches
 
@@ -477,6 +481,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jun 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-2
+- Add ALSA UCM 1.2.5 compatibility fixes
+
 * Wed Jun 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-1
 - Update to 0.3.30
 
