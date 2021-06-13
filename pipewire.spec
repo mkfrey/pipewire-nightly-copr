@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 29
+%global microversion 30
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -472,6 +472,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jun 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-2
+- Add ALSA UCM 1.2.5 compatibility fixes
+
+* Wed Jun 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-1
+- Update to 0.3.30
+
 * Fri Jun 04 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.29-2
 - Add some important patches.
 
