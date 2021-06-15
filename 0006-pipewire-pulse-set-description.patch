@@ -1,0 +1,25 @@
+From 01875ad223235d363131ce72779e885eca55303e Mon Sep 17 00:00:00 2001
+From: Nicolai Syvertsen <saivert@saivert.com>
+Date: Thu, 10 Jun 2021 22:21:26 +0200
+Subject: [PATCH] pipewire-pulse: set description
+
+Some applications like TeamSpeak crash when this isn't set.
+---
+ src/modules/module-protocol-pulse/modules/module-combine-sink.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/modules/module-protocol-pulse/modules/module-combine-sink.c b/src/modules/module-protocol-pulse/modules/module-combine-sink.c
+index e2399a5a..3a1c4bac 100644
+--- a/src/modules/module-protocol-pulse/modules/module-combine-sink.c
++++ b/src/modules/module-protocol-pulse/modules/module-combine-sink.c
+@@ -327,6 +327,7 @@ static int module_combine_sink_load(struct client *client, struct module *module
+ 
+ 	props = pw_properties_new(NULL, NULL);
+ 	pw_properties_set(props, PW_KEY_NODE_NAME, data->sink_name);
++	pw_properties_set(props, PW_KEY_NODE_DESCRIPTION, data->sink_name);
+ 	pw_properties_set(props, PW_KEY_MEDIA_CLASS, "Audio/Sink");
+ 	pw_properties_setf(props, PW_KEY_NODE_GROUP, "combine_sink-%u", data->module->idx);
+ 	pw_properties_set(props, PW_KEY_NODE_VIRTUAL, "true");
+-- 
+2.31.1
+

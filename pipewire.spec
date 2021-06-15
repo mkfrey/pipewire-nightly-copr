@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 4
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,6 +57,7 @@ Patch0001:      0002-alsa-open-UCM-only-once.patch
 Patch0002:      0003-acp-don-t-use-the-card-index-for-alibpref.patch
 Patch0003:      0004-alsa-use-the-local-alibpref-of-the-card.patch
 Patch0004:      0005-alsa-strip-and-add-the-_alibpref-from-device-names.patch
+Patch0005:      0006-pipewire-pulse-set-description.patch
 
 ## upstreamable patches
 
@@ -481,6 +482,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jun 15 2021 Łukasz Patron <priv.luk@gmail.com> - 0.3.30-4
+- Add patch for setting node description for module-combine-sink
+
 * Tue Jun 15 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-3
 - Rebuild for Gstreamer update
 
