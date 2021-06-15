@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 3
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -481,6 +481,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jun 15 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-3
+- Rebuild for Gstreamer update
+
 * Thu Jun 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.30-2
 - Add ALSA UCM 1.2.5 compatibility fixes
 
