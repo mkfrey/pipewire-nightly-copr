@@ -52,6 +52,7 @@ BuildRequires:  g++
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  pkgconfig(libusb)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.32
 BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.32
 BuildRequires:  pkgconfig(gstreamer-1.0) >= 1.10.0
@@ -355,6 +356,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/pipewire.conf
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
 %{_datadir}/pipewire/media-session.d/bluez-monitor.conf
+%{_datadir}/pipewire/media-session.d/bluez-hardware.conf
 %{_datadir}/pipewire/media-session.d/media-session.conf
 %{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
 %{_datadir}/pipewire/filter-chain/*.conf
