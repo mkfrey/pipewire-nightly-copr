@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 4
+%global baserelease 5
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -105,6 +105,8 @@ Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       systemd >= 184
 Requires:       rtkit
+# A virtual Provides so we can swap session managers
+Requires:       pipewire-session-manager
 
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
@@ -153,6 +155,18 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description utils
 This package contains command line utilities for the PipeWire media server.
+
+%package media-session
+Summary:        PipeWire Media Session Manager
+License:        MIT
+Recommends:     %{name}%{?_isa} = %{version}-%{release}
+Obsoletes:      %{name}-libpulse < %{version}-%{release}
+
+Provides:       pipewire-session-manager
+
+%description media-session
+This package contains the reference Media Session Manager for the
+PipeWire media server.
 
 %if %{with alsa}
 %package alsa
@@ -357,17 +371,29 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %doc README.md
 %{_userunitdir}/pipewire.*
 %{_bindir}/pipewire
-%{_bindir}/pipewire-media-session
 %{_mandir}/man1/pipewire.1*
 %dir %{_datadir}/pipewire/
-%dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/pipewire.conf
+%{_datadir}/pipewire/filter-chain/*.conf
+%{_mandir}/man5/pipewire.conf.5*
+
+%files media-session
+%{_bindir}/pipewire-media-session
+%dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
 %{_datadir}/pipewire/media-session.d/bluez-monitor.conf
 %{_datadir}/pipewire/media-session.d/media-session.conf
 %{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
-%{_datadir}/pipewire/filter-chain/*.conf
-%{_mandir}/man5/pipewire.conf.5*
+
+%if %{with alsa}
+%{_datadir}/pipewire/media-session.d/with-alsa
+%endif
+%if %{with jack}
+%{_datadir}/pipewire/media-session.d/with-jack
+%endif
+%if %{with pulse}
+%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%endif
 
 %files libs -f %{name}.lang
 %license LICENSE COPYING
@@ -446,7 +472,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
-%{_datadir}/pipewire/media-session.d/with-alsa
 %endif
 
 %if %{with jack}
@@ -457,7 +482,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/pipewire-%{apiversion}/jack/libjacknet.so.*
 %{_libdir}/pipewire-%{apiversion}/jack/libjackserver.so.*
 %{_datadir}/pipewire/jack.conf
-%{_datadir}/pipewire/media-session.d/with-jack
 %{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 
 %files jack-audio-connection-kit-devel
@@ -477,11 +501,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %files pulseaudio
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
-%{_datadir}/pipewire/media-session.d/with-pulseaudio
 %{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
 %changelog
+* Fri Jun 25 2021 Peter Hutterer <peter.hutterer@redhat.com> - 0.3.30-5
+- Split media-session into a subpackage and Require it through a virtual
+  Provides from the main pipewire package
+
 * Tue Jun 15 2021 Łukasz Patron <priv.luk@gmail.com> - 0.3.30-4
 - Add patch for setting node description for module-combine-sink
 
