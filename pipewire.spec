@@ -266,6 +266,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D bluez5-codec-aptx=disabled                                       \
     -D bluez5-codec-ldac=enabled                                        \
     -D wireplumber=disabled                                             \
+    -D roc=disabled                                                     \
     %{!?with_jack:-D pipewire-jack=disabled} 					\
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
     %{?with_jack:-D jack-devel=enabled} 					\
