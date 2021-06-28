@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -502,6 +502,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-2
+- Fix session manager path
+
 * Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-1
 - Update to 0.3.31
 
