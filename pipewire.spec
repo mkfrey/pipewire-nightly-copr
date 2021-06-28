@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 30
+%global microversion 31
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 5
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -53,11 +53,6 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
-Patch0001:      0002-alsa-open-UCM-only-once.patch
-Patch0002:      0003-acp-don-t-use-the-card-index-for-alibpref.patch
-Patch0003:      0004-alsa-use-the-local-alibpref-of-the-card.patch
-Patch0004:      0005-alsa-strip-and-add-the-_alibpref-from-device-names.patch
-Patch0005:      0006-pipewire-pulse-set-description.patch
 
 ## upstreamable patches
 
@@ -100,6 +95,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
+BuildRequires:  libusb-devel
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -284,7 +280,7 @@ This package provides a PulseAudio implementation based on PipeWire
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
     -D gstreamer-device-provider=disabled -D sdl2=disabled 			\
     -D libcamera=disabled -D audiotestsrc=disabled -D videotestsrc=disabled	\
-    -D volume=disabled -D bluez5-codec-aptx=disabled 				\
+    -D volume=disabled -D bluez5-codec-aptx=disabled -D roc=disabled 		\
 %ifarch s390x
     -D bluez5-codec-ldac=disabled						\
 %endif
@@ -381,6 +377,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire-media-session
 %dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
+%{_datadir}/pipewire/media-session.d/bluez-hardware.conf
 %{_datadir}/pipewire/media-session.d/bluez-monitor.conf
 %{_datadir}/pipewire/media-session.d/media-session.conf
 %{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
@@ -505,6 +502,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-1
+- Update to 0.3.31
+
 * Fri Jun 25 2021 Peter Hutterer <peter.hutterer@redhat.com> - 0.3.30-5
 - Split media-session into a subpackage and Require it through a virtual
   Provides from the main pipewire package
