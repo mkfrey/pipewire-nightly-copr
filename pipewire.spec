@@ -280,7 +280,6 @@ This package provides a PulseAudio implementation based on PipeWire
     -D gstreamer-device-provider=disabled                               \
     -D sdl2=enabled                                                     \
     -D sndfile=enabled                                                  \
-    -D bluez5-codec-aptx=disabled                                       \
     -D bluez5-codec-ldac=enabled                                        \
     -D roc=disabled                                                     \
 %ifarch s390x
