@@ -319,9 +319,6 @@ rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
-# We don't start the media session with systemd yet
-rm %{buildroot}%{_userunitdir}/pipewire-media-session.*
-
 %find_lang %{name}
 
 # upstream should use udev.pc
@@ -375,6 +372,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %files media-session
 %{_bindir}/pipewire-media-session
+%{_userunitdir}/pipewire-media-session.*
 %dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
 %{_datadir}/pipewire/media-session.d/bluez-hardware.conf
