@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 3
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -158,7 +158,9 @@ License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-libpulse < %{version}-%{release}
 
+# Virtual Provides to support swapping between PipeWire session manager implementations
 Provides:       pipewire-session-manager
+Conflicts:      pipewire-session-manager
 
 %description media-session
 This package contains the reference Media Session Manager for the
@@ -502,6 +504,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Jul 05 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.31-3
+- Add "Conflicts: pipewire-session-manager" to pipewire-media-session
+  to enforce one implementation of the session manager at a time
+
 * Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-2
 - Fix session manager path
 
