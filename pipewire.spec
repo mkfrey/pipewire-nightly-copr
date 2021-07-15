@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 4
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -57,7 +57,6 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 ## upstreamable patches
 
 ## fedora patches
-Patch1001:      0001-conf-start-media-session-through-pipewire.patch
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -321,9 +320,6 @@ rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
 %endif
 
-# We don't start the media session with systemd yet
-rm %{buildroot}%{_userunitdir}/pipewire-media-session.*
-
 %find_lang %{name}
 
 # upstream should use udev.pc
@@ -377,6 +373,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 
 %files media-session
 %{_bindir}/pipewire-media-session
+%{_userunitdir}/pipewire-media-session.service
 %dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
 %{_datadir}/pipewire/media-session.d/bluez-hardware.conf
@@ -504,6 +501,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Jul 15 2021 Peter Hutterer <peter.hutterer@redhat.com> - 0.3.31-4
+- Enable media-session.service, requires fedora-release-35-0.10 to enable the
+  service by default (#1976006).
+
 * Mon Jul 05 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.31-3
 - Add "Conflicts: pipewire-session-manager" to pipewire-media-session
   to enforce one implementation of the session manager at a time
