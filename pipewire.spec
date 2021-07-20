@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 31
+%global microversion 32
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 4
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -501,6 +501,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Tue Jul 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-1
+- Update to 0.3.32
+
 * Thu Jul 15 2021 Peter Hutterer <peter.hutterer@redhat.com> - 0.3.31-4
 - Enable media-session.service, requires fedora-release-35-0.10 to enable the
   service by default (#1976006).
