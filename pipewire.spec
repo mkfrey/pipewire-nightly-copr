@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -22,6 +22,7 @@
 
 # Build conditions for various features
 %bcond_without alsa
+%bcond_without media_session
 %bcond_without vulkan
 
 # Features disabled for RHEL 8
@@ -151,6 +152,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
+%if %{with media_session}
 %package media-session
 Summary:        PipeWire Media Session Manager
 License:        MIT
@@ -164,6 +166,7 @@ Conflicts:      pipewire-session-manager
 %description media-session
 This package contains the reference Media Session Manager for the
 PipeWire media server.
+%endif
 
 %if %{with alsa}
 %package alsa
@@ -285,6 +288,7 @@ This package provides a PulseAudio implementation based on PipeWire
 %ifarch s390x
     -D bluez5-codec-ldac=disabled						\
 %endif
+    %{!?with_media_session:-D session-managers=[]} 				\
     %{!?with_jack:-D pipewire-jack=disabled} 					\
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
     %{?with_jack:-D jack-devel=enabled} 					\
@@ -300,7 +304,11 @@ mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
 rm %{buildroot}%{_datadir}/pipewire/jack.conf
+
+%if %{with media_session}
 rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-jack
+%endif
+
 %endif
 
 %if %{with alsa}
@@ -309,15 +317,23 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+
+%if %{with media_session}
 touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
+%endif
+
 %endif
 
 %if ! %{with pulse}
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
+
+%if %{with media_session}
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%endif
+
 %endif
 
 %find_lang %{name}
@@ -371,6 +387,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
 
+%if %{with media_session}
 %files media-session
 %{_bindir}/pipewire-media-session
 %{_userunitdir}/pipewire-media-session.service
@@ -389,6 +406,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 %if %{with pulse}
 %{_datadir}/pipewire/media-session.d/with-pulseaudio
+%endif
+
 %endif
 
 %files libs -f %{name}.lang
@@ -501,6 +520,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Wed Jul 21 2021 Neal Gompa <ngompa@fedoraproject.org> - 0.3.32-2
+- Add conditional for media-session subpackage
+
 * Tue Jul 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-1
 - Update to 0.3.32
 
