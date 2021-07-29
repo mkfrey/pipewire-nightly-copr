@@ -86,7 +86,7 @@ BuildRequires:  avahi-devel
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 BuildRequires:  libusb-devel
 
-BuildRequires:  pkgconfig(libopenaptx)
+BuildRequires:  pkgconfig(libfreeaptx)
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
