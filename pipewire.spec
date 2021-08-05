@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 4
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -158,6 +158,8 @@ Summary:        PipeWire Media Session Manager
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-libpulse < %{version}-%{release}
+# before 0.3.30-5 the session manager was in the main pipewire package
+Conflicts:      %{name}%{?_isa} < 0.3.30-5
 
 # Virtual Provides to support swapping between PipeWire session manager implementations
 Provides:       pipewire-session-manager
@@ -520,6 +522,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Aug 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-4
+- Add media-session Conflicts: with older pipewire versions, they can't be
+  installed at the same time because they both contain the media-session binary.
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.32-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
