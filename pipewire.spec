@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 32
+%global microversion 33
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 4
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -522,6 +522,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Aug 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.33-1
+- Update to 0.3.33
+
 * Thu Aug 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-4
 - Add media-session Conflicts: with older pipewire versions, they can't be
   installed at the same time because they both contain the media-session binary.
