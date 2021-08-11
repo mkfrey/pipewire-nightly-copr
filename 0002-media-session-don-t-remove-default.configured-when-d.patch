@@ -1,7 +1,7 @@
 From b9d6b098a9bdfa4d4295e8a9e05ab4044df9db81 Mon Sep 17 00:00:00 2001
 From: Pauli Virtanen <pav@iki.fi>
 Date: Sun, 8 Aug 2021 13:11:43 +0300
-Subject: [PATCH 2/3] media-session: don't remove default.configured when
+Subject: [PATCH 2/6] media-session: don't remove default.configured when
  devices go away
 
 There's no particular problem to have default.configured to point to a
