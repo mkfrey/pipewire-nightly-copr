@@ -15,6 +15,7 @@
 
 # Build conditions for various features
 %bcond_without alsa
+%bcond_without media_session
 %bcond_without vulkan
 
 # Features disabled for RHEL 8
@@ -142,17 +143,23 @@ Requires:       ncurses-libs
 %description utils
 This package contains command line utilities for the PipeWire media server.
 
+%if %{with media_session}
 %package media-session
 Summary:        PipeWire Media Session Manager
 License:        MIT
 Recommends:     %{name}%{?_isa} = %{version}-%{release}
 Obsoletes:      %{name}-libpulse < %{version}-%{release}
+# before 0.3.30-5 the session manager was in the main pipewire package
+Conflicts:      %{name}%{?_isa} < 0.3.30-5
 
+# Virtual Provides to support swapping between PipeWire session manager implementations
 Provides:       pipewire-session-manager
+Conflicts:      pipewire-session-manager
 
 %description media-session
 This package contains the reference Media Session Manager for the
 PipeWire media server.
+%endif
 
 %if %{with alsa}
 %package alsa
@@ -284,10 +291,11 @@ This package provides a PulseAudio implementation based on PipeWire
 %ifarch s390x
     -D bluez5-codec-ldac=disabled                                       \
 %endif
-    %{!?with_jack:-D pipewire-jack=disabled}                            \
-    %{!?with_jackserver_plugin:-D jack=disabled}                        \
-    %{?with_jack:-D jack-devel=true}                                 \
-    %{!?with_alsa:-D pipewire-alsa=disabled}                            \
+    %{!?with_media_session:-D session-managers=[]} 				\
+    %{!?with_jack:-D pipewire-jack=disabled} 					\
+    %{!?with_jackserver_plugin:-D jack=disabled} 				\
+    %{?with_jack:-D jack-devel=true} 					\
+    %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
@@ -299,7 +307,11 @@ mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
 echo %{_libdir}/pipewire-%{apiversion}/jack/ > %{buildroot}%{_sysconfdir}/ld.so.conf.d/pipewire-jack-%{_arch}.conf
 %else
 rm %{buildroot}%{_datadir}/pipewire/jack.conf
+
+%if %{with media_session}
 rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-jack
+%endif
+
 %endif
 
 %if %{with alsa}
@@ -308,15 +320,23 @@ cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/50-pipewire.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 cp %{buildroot}%{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf \
         %{buildroot}%{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+
+%if %{with media_session}
 touch %{buildroot}%{_datadir}/pipewire/media-session.d/with-alsa
+%endif
+
 %endif
 
 %if ! %{with pulse}
 # If the PulseAudio replacement isn't being offered, delete the files
 rm %{buildroot}%{_bindir}/pipewire-pulse
 rm %{buildroot}%{_userunitdir}/pipewire-pulse.*
-rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 rm %{buildroot}%{_datadir}/pipewire/pipewire-pulse.conf
+
+%if %{with media_session}
+rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
+%endif
+
 %endif
 
 %find_lang %{name}
@@ -370,9 +390,10 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
 
+%if %{with media_session}
 %files media-session
 %{_bindir}/pipewire-media-session
-%{_userunitdir}/pipewire-media-session.*
+%{_userunitdir}/pipewire-media-session.service
 %dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
 %{_datadir}/pipewire/media-session.d/bluez-hardware.conf
@@ -388,6 +409,8 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 %if %{with pulse}
 %{_datadir}/pipewire/media-session.d/with-pulseaudio
+%endif
+
 %endif
 
 %files libs -f %{name}.lang
@@ -500,6 +523,42 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Aug 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.34-1
+- Update to 0.3.34
+
+* Wed Aug 11 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.33-3
+- Add more upstream patches.
+
+* Tue Aug 10 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.33-2
+- Add patch to fix default device persistence.
+
+* Thu Aug 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.33-1
+- Update to 0.3.33
+
+* Thu Aug 5 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-4
+- Add media-session Conflicts: with older pipewire versions, they can't be
+  installed at the same time because they both contain the media-session binary.
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.32-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Wed Jul 21 2021 Neal Gompa <ngompa@fedoraproject.org> - 0.3.32-2
+- Add conditional for media-session subpackage
+
+* Tue Jul 20 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.32-1
+- Update to 0.3.32
+
+* Thu Jul 15 2021 Peter Hutterer <peter.hutterer@redhat.com> - 0.3.31-4
+- Enable media-session.service, requires fedora-release-35-0.10 to enable the
+  service by default (#1976006).
+
+* Mon Jul 05 2021 Neal Gompa <ngompa13@gmail.com> - 0.3.31-3
+- Add "Conflicts: pipewire-session-manager" to pipewire-media-session
+  to enforce one implementation of the session manager at a time
+
+* Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-2
+- Fix session manager path
+
 * Mon Jun 28 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.31-1
 - Update to 0.3.31
 
