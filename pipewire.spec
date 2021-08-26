@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 33
+%global microversion 34
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 3
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -54,11 +54,6 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{ver
 %endif
 
 ## upstream patches
-Patch0001:      0002-media-session-don-t-remove-default.configured-when-d.patch
-Patch0002:      0003-acp-compare-the-HW-volume-against-stored-HW-volume.patch
-Patch0003:      0004-udev-fix-behringer-UMC202-usb-device-id.patch
-Patch0004:      0005-alsa-free-alibpref-after-use.patch
-Patch0005:      0006-alsa-Free-global-state.patch
 
 ## upstreamable patches
 
@@ -298,7 +293,7 @@ This package provides a PulseAudio implementation based on PipeWire
     %{!?with_media_session:-D session-managers=[]} 				\
     %{!?with_jack:-D pipewire-jack=disabled} 					\
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
-    %{?with_jack:-D jack-devel=enabled} 					\
+    %{?with_jack:-D jack-devel=true} 					\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
@@ -527,6 +522,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Aug 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.34-1
+- Update to 0.3.34
+
 * Wed Aug 11 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.33-3
 - Add more upstream patches.
 
