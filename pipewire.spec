@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 1
+%global baserelease 2
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -103,6 +103,8 @@ Requires:       systemd >= 184
 Requires:       rtkit
 # A virtual Provides so we can swap session managers
 Requires:       pipewire-session-manager
+# Prefer WirePlumber for session manager
+Suggests:       wireplumber
 
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
@@ -522,6 +524,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Mon Aug 30 2021 Neal Gompa <ngompa@fedoraproject.org> - 0.3.34-2
+- Add preference for WirePlumber for session manager (#1989959)
+
 * Thu Aug 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.34-1
 - Update to 0.3.34
 
