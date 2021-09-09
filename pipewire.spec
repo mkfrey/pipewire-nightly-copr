@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 34
+%global microversion 35
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -8,7 +8,7 @@
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
 
 # For rpmdev-bumpspec and releng automation
-%global baserelease 2
+%global baserelease 1
 
 #global snapdate   20210107
 #global gitcommit  b17db2cebc1a5ab2c01851d29c05f79cd2f262bb
@@ -87,7 +87,7 @@ BuildRequires:  systemd-devel >= 184
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
 BuildRequires:  doxygen
-BuildRequires:  xmltoman
+BuildRequires:  python-docutils
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
@@ -524,6 +524,9 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Sep 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.35-1
+- Update to 0.3.35
+
 * Mon Aug 30 2021 Neal Gompa <ngompa@fedoraproject.org> - 0.3.34-2
 - Add preference for WirePlumber for session manager (#1989959)
 
