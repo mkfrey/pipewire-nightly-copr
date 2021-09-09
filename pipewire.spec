@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 34
+%global microversion 35
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -75,7 +75,7 @@ BuildRequires:  systemd-devel >= 184
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
 BuildRequires:  doxygen
-BuildRequires:  xmltoman
+BuildRequires:  python-docutils
 BuildRequires:  graphviz
 BuildRequires:  sbc-devel
 BuildRequires:  libsndfile-devel
@@ -95,6 +95,8 @@ Requires:       systemd >= 184
 Requires:       rtkit
 # A virtual Provides so we can swap session managers
 Requires:       pipewire-session-manager
+# Prefer WirePlumber for session manager
+Suggests:       wireplumber
 
 %description
 PipeWire is a multimedia server for Linux and other Unix like operating
@@ -524,6 +526,15 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %endif
 
 %changelog
+* Thu Sep 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.35-2
+- Add patch to fix passthrough check.
+
+* Thu Sep 09 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.35-1
+- Update to 0.3.35
+
+* Mon Aug 30 2021 Neal Gompa <ngompa@fedoraproject.org> - 0.3.34-2
+- Add preference for WirePlumber for session manager (#1989959)
+
 * Thu Aug 26 2021 Wim Taymans <wtaymans@redhat.com> - 0.3.34-1
 - Update to 0.3.34
 
