@@ -1,0 +1,33 @@
+From 3eec78bcb7ca9ced50cd525dc590bad663f44d36 Mon Sep 17 00:00:00 2001
+From: Wim Taymans <wtaymans@redhat.com>
+Date: Thu, 9 Sep 2021 16:24:04 +0200
+Subject: [PATCH] media-session: only check passthrough when available
+
+When none of the nodes have a valid passthrough format, don't check if
+passthrough is possible.
+
+Without the check, it is possible that a node has a common format with
+the peer that is not a passthrough format, like a raw audio format.
+
+Fixes #1587
+---
+ src/examples/media-session/policy-node.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/examples/media-session/policy-node.c b/src/examples/media-session/policy-node.c
+index ceeb11c42..68732c247 100644
+--- a/src/examples/media-session/policy-node.c
++++ b/src/examples/media-session/policy-node.c
+@@ -217,6 +217,9 @@ static bool check_passthrough(struct node *node, struct node *peer)
+ 	if (peer->obj->info->state == PW_NODE_STATE_RUNNING)
+ 		return false;
+ 
++	if (!node->have_passthrough || !peer->have_passthrough)
++		return false;
++
+ 	spa_list_for_each(p1, &node->obj->param_list, link) {
+ 		if (p1->id != SPA_PARAM_EnumFormat)
+ 			continue;
+-- 
+2.31.1
+
