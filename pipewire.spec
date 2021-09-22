@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 36
+%global microversion 37
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -392,13 +392,14 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
 
+%{_datadir}/spa-%{spaversion}/bluez5/bluez-hardware.conf
+
 %if %{with media_session}
 %files media-session
 %{_bindir}/pipewire-media-session
 %{_userunitdir}/pipewire-media-session.service
 %dir %{_datadir}/pipewire/media-session.d/
 %{_datadir}/pipewire/media-session.d/alsa-monitor.conf
-%{_datadir}/pipewire/media-session.d/bluez-hardware.conf
 %{_datadir}/pipewire/media-session.d/bluez-monitor.conf
 %{_datadir}/pipewire/media-session.d/media-session.conf
 %{_datadir}/pipewire/media-session.d/v4l2-monitor.conf
@@ -462,6 +463,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pw-cli
 %{_bindir}/pw-dot
 %{_bindir}/pw-cat
+%{_bindir}/pw-dsdplay
 %{_bindir}/pw-dump
 %{_bindir}/pw-link
 %{_bindir}/pw-loopback
