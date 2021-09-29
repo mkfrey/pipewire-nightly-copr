@@ -71,6 +71,7 @@ BuildRequires:  pkgconfig(fdk-aac)
 BuildRequires:  pkgconfig(vulkan)
 %endif
 BuildRequires:  pkgconfig(bluez)
+BuildRequires:  pkgconfig(readline)
 BuildRequires:  systemd-devel >= 184
 BuildRequires:  alsa-lib-devel
 BuildRequires:  libv4l-devel
@@ -141,6 +142,7 @@ License:        MIT
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       ncurses-libs
+Requires:       readline
 
 %description utils
 This package contains command line utilities for the PipeWire media server.
