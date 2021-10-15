@@ -17,6 +17,7 @@
 %bcond_without alsa
 %bcond_without media_session
 %bcond_without vulkan
+%bcond_without v4l2
 
 # Features disabled for RHEL 8
 %if 0%{?rhel} && 0%{?rhel} < 9
@@ -33,6 +34,15 @@
 %else
 %bcond_without jackserver_plugin
 %endif
+
+	
+# Disabled for RHEL < 10 and Fedora < 36
+%if (0%{?rhel} && 0%{?rhel} < 10) || (0%{?fedora} && 0%{?fedora} < 36)
+%bcond_with libcamera_plugin
+%else
+%bcond_without libcamera_plugin
+%endif
+ 
 
 Name:           pipewire
 Summary:        Media Sharing Server
@@ -163,6 +173,16 @@ Conflicts:      pipewire-session-manager
 %description media-session
 This package contains the reference Media Session Manager for the
 PipeWire media server.
+%endif
+
+%if %{with_v4l2}
+%package v4l2
+Summary:        Pipewire v4l2 integration
+License:        MIT
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description v4l2
+This package contains the Pipewire v4l2 integration
 %endif
 
 %if %{with alsa}
@@ -300,6 +320,7 @@ This package provides a PulseAudio implementation based on PipeWire
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
     %{?with_jack:-D jack-devel=true} 					\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
+    %{!?with_v4l2:-D pipewire-v4l2=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
@@ -496,6 +517,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/alsa/alsa.conf.d/99-pipewire-default.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/50-pipewire.conf
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
+%endif
+
+%if %{with v4l2}
+%files v4l2
+%{_bindir}/pw-v4l2
+%{_libdir}/pipewire-%{apiversion}/v4l2/libpw-v4l2.so
 %endif
 
 %if %{with jack}
