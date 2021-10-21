@@ -1,11 +1,12 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 38
+%global microversion 39
 
 %global apiversion   0.3
 %global spaversion   0.2
 %global soversion    0
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
+%global ms_version   0.4.0
 
 # https://bugzilla.redhat.com/983606
 %global _hardened_build 1
@@ -17,7 +18,6 @@
 %bcond_without alsa
 %bcond_without media_session
 %bcond_without vulkan
-%bcond_without v4l2
 
 # Features disabled for RHEL 8
 %if 0%{?rhel} && 0%{?rhel} < 9
@@ -43,6 +43,7 @@
 %bcond_without libcamera_plugin
 %endif
  
+%bcond_without v4l2
 
 Name:           pipewire
 Summary:        Media Sharing Server
@@ -51,10 +52,12 @@ Release:        %(date +%%y%%m%%d)%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 Source0:	https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/master/pipewire-master.tar.gz
-
+Source1:        https://gitlab.freedesktop.org/pipewire/media-session/-/archive/%{ms_version}/media-session-%{ms_version}.tar.gz
+ 
 ## upstreamable patches
 
 ## fedora patches
+Patch0:      0001-Build-media-session-from-local-tarbal.patch
 
 BuildRequires:  gettext
 BuildRequires:  meson >= 0.49.0
@@ -175,16 +178,6 @@ This package contains the reference Media Session Manager for the
 PipeWire media server.
 %endif
 
-%if %{with_v4l2}
-%package v4l2
-Summary:        Pipewire v4l2 integration
-License:        MIT
-Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-
-%description v4l2
-This package contains the Pipewire v4l2 integration
-%endif
-
 %if %{with alsa}
 %package alsa
 Summary:        PipeWire media server ALSA support
@@ -293,8 +286,23 @@ Provides:       pulseaudio-module-jack
 This package provides a PulseAudio implementation based on PipeWire
 %endif
 
+%if %{with_v4l2}
+%package v4l2
+Summary:        PipeWire media server v4l2 LD_PRELOAD support
+License:        MIT
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description v4l2
+This package contains an LD_PRELOAD library that redirects v4l2 applications to
+PipeWire.
+%endif
+
 %prep
 %setup -q -T -b0 -n %{name}-master
+%patch0 -p1
+
+mkdir subprojects/packagefiles
+cp %{SOURCE1} subprojects/packagefiles/
 
 %build
 %meson \
@@ -318,9 +326,9 @@ This package provides a PulseAudio implementation based on PipeWire
     %{!?with_media_session:-D session-managers=[]} 				\
     %{!?with_jack:-D pipewire-jack=disabled} 					\
     %{!?with_jackserver_plugin:-D jack=disabled} 				\
+    %{!?with_libcamera_plugin:-D libcamera=disabled} 				\
     %{?with_jack:-D jack-devel=true} 					\
     %{!?with_alsa:-D pipewire-alsa=disabled}					\
-    %{!?with_v4l2:-D pipewire-v4l2=disabled}					\
     %{?with_vulkan:-D vulkan=enabled}
 %meson_build
 
@@ -365,6 +373,9 @@ rm %{buildroot}%{_datadir}/pipewire/media-session.d/with-pulseaudio
 %endif
 
 %find_lang %{name}
+%if %{with media_session}            
+%find_lang media-session            
+%endif
 
 # upstream should use udev.pc
 mkdir -p %{buildroot}%{_prefix}/lib/udev/rules.d
@@ -418,7 +429,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/spa-%{spaversion}/bluez5/bluez-hardware.conf
 
 %if %{with media_session}
-%files media-session
+%files media-session -f media-session.lang
 %{_bindir}/pipewire-media-session
 %{_userunitdir}/pipewire-media-session.service
 %dir %{_datadir}/pipewire/media-session.d/
@@ -519,12 +530,6 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/alsa/conf.d/99-pipewire-default.conf
 %endif
 
-%if %{with v4l2}
-%files v4l2
-%{_bindir}/pw-v4l2
-%{_libdir}/pipewire-%{apiversion}/v4l2/libpw-v4l2.so
-%endif
-
 %if %{with jack}
 %files jack-audio-connection-kit
 %{_bindir}/pw-jack
@@ -553,6 +558,12 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_bindir}/pipewire-pulse
 %{_userunitdir}/pipewire-pulse.*
 %{_datadir}/pipewire/pipewire-pulse.conf
+%endif
+
+%if %{with v4l2}
+%files v4l2
+%{_bindir}/pw-v4l2
+%{_libdir}/pipewire-%{apiversion}/v4l2/libpw-v4l2.so
 %endif
 
 %changelog
