@@ -17,8 +17,8 @@ index f6b4e62fb..a6249e5e1 100644
 -url = https://gitlab.freedesktop.org/pipewire/media-session.git
 -revision = head
 +[wrap-file]
-+source_filename = media-session-0.4.0.tar.gz
-+directory = media-session-0.4.0
++source_filename = media-session-0.4.1.tar.gz
++directory = media-session-0.4.1
  
 -- 
 2.31.1
