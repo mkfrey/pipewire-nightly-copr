@@ -6,7 +6,7 @@
 %global spaversion   0.2
 %global soversion    0
 %global libversion   %{soversion}.%(bash -c '((intversion = (%{minorversion} * 100) + %{microversion})); echo ${intversion}').0
-%global ms_version   0.4.0
+%global ms_version   0.4.1
 
 # https://bugzilla.redhat.com/983606
 %global _hardened_build 1
@@ -557,6 +557,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %if %{with pulse}
 %files pulseaudio
 %{_bindir}/pipewire-pulse
+%{_mandir}/man1/pipewire-pulse.1*
 %{_userunitdir}/pipewire-pulse.*
 %{_datadir}/pipewire/pipewire-pulse.conf
 %endif
