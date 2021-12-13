@@ -1,6 +1,6 @@
 %global majorversion 0
 %global minorversion 3
-%global microversion 40
+%global microversion 41
 
 %global apiversion   0.3
 %global spaversion   0.2
@@ -100,6 +100,8 @@ BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 BuildRequires:  libusb-devel
+BuildRequires:  readline-devel            
+BuildRequires:  lilv-devel            
 BuildRequires:  openssl-devel
 
 Requires(pre):  shadow-utils
