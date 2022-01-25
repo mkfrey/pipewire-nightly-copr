@@ -103,6 +103,8 @@ BuildRequires:  libusb-devel
 BuildRequires:  readline-devel            
 BuildRequires:  lilv-devel            
 BuildRequires:  openssl-devel
+BuildRequires:  libcanberra-devel
+BuildRequires:  libX11-xcb
 
 Requires(pre):  shadow-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -428,6 +430,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_datadir}/pipewire/pipewire.conf
 %{_datadir}/pipewire/filter-chain/*.conf
 %{_mandir}/man5/pipewire.conf.5*
+%{_datadir}/pipewire/minimal.conf
 
 %{_datadir}/spa-%{spaversion}/bluez5/bluez-hardware.conf
 
