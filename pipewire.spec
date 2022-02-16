@@ -468,6 +468,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_prefix}/lib/udev/rules.d/90-pipewire-alsa.rules
 %dir %{_libdir}/spa-%{spaversion}
 %{_libdir}/spa-%{spaversion}/alsa/
+%{_libdir}/spa-%{spaversion}/aec/
 %{_libdir}/spa-%{spaversion}/audioconvert/
 %{_libdir}/spa-%{spaversion}/audiomixer/
 %{_libdir}/spa-%{spaversion}/bluez5/
